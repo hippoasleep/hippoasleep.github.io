@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="AOP：在方法之前和之后做一些增强的Aspect Oriented Programming(面向切面编程、面向方面编程)，就是面向特定的方法编程 场景：记录操作日志权限控制事务管理 实现动态代理是面向切面编程最主流的实现。而SpringAOP是Spring框架的高级技术，旨在管理bean对象的过程中，主要通过底层的动态代理机制，对特定的方法进行编程。 aop面向切面编程案例：@Aspect  表示">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AOP">
+<meta property="og:url" content="http://example.com/2023/08/15/AOP/index.html">
+<meta property="og:site_name" content="河马窝苑">
+<meta property="og:description" content="AOP：在方法之前和之后做一些增强的Aspect Oriented Programming(面向切面编程、面向方面编程)，就是面向特定的方法编程 场景：记录操作日志权限控制事务管理 实现动态代理是面向切面编程最主流的实现。而SpringAOP是Spring框架的高级技术，旨在管理bean对象的过程中，主要通过底层的动态代理机制，对特定的方法进行编程。 aop面向切面编程案例：@Aspect  表示">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/35579562/1682409572652-5761bb3d-d5aa-4105-9fba-986049e7ab51.png#averageHue=%23f6e7e4&clientId=ua2da27cf-83d9-4&from=drop&id=ub9331b09&originHeight=713&originWidth=1408&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=626096&status=done&style=none&taskId=u52562d6e-bb19-49f8-8493-c14f5df7444&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/35579562/1682409198758-2aa118d3-9813-477c-aba1-3acc3ddcb400.png#averageHue=%23fcfcfb&clientId=ua2da27cf-83d9-4&from=drop&id=u28634f14&originHeight=705&originWidth=839&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=276162&status=done&style=none&taskId=u730bd731-b13f-47e4-9dc4-09225e21e57&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/35579562/1682411237511-6526c273-f095-4acb-a8e3-d190c063ccac.png#averageHue=%23eeefe4&clientId=u14b963f4-ee70-4&from=drop&id=ua4be4534&originHeight=80&originWidth=759&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=43221&status=done&style=none&taskId=u3abdbacc-f442-42d3-a18c-13f271d8e00&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/35579562/1682477716143-2ad624d8-74d3-485d-a86d-f0e751d2119d.png#averageHue=%23f7e2d5&clientId=ubc2c7572-1662-4&from=drop&id=r8D7p&originHeight=538&originWidth=1479&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=41140&status=done&style=none&taskId=u20be77d4-dd31-4132-9820-e4a4ee959da&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/35579562/1682410288334-724341ae-7980-487c-8412-e13067a31a03.png#averageHue=%23efeaea&clientId=u14b963f4-ee70-4&from=drop&id=ucd576e7f&originHeight=335&originWidth=1017&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=185306&status=done&style=none&taskId=u7936dfde-8db7-4079-9c89-56f51fb3b6e&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/35579562/1682411046052-7a17e20e-d96d-48e0-93de-493115957249.png#averageHue=%23f1eded&clientId=u14b963f4-ee70-4&from=drop&id=eTqj2&originHeight=170&originWidth=1296&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=89547&status=done&style=none&taskId=u78ad03a3-be21-4213-a49b-2b905b5dc15&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/35579562/1682412108227-51eabcc1-8bbc-4707-9664-cd6d6e6c2506.png#averageHue=%23f1e7e6&clientId=u14b963f4-ee70-4&from=drop&id=ue15565d6&originHeight=358&originWidth=576&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=139057&status=done&style=none&taskId=u9864f35b-f353-4061-9f3d-7e82815c6a3&title=">
+<meta property="article:published_time" content="2023-08-15T11:17:58.381Z">
+<meta property="article:modified_time" content="2023-08-15T11:32:31.398Z">
+<meta property="article:author" content="河马">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.nlark.com/yuque/0/2023/png/35579562/1682409572652-5761bb3d-d5aa-4105-9fba-986049e7ab51.png#averageHue=%23f6e7e4&clientId=ua2da27cf-83d9-4&from=drop&id=ub9331b09&originHeight=713&originWidth=1408&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=626096&status=done&style=none&taskId=u52562d6e-bb19-49f8-8493-c14f5df7444&title=">
+
+<link rel="canonical" href="http://example.com/2023/08/15/AOP/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>AOP | 河马窝苑</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">河马窝苑</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-resources">
+
+    <a href="/resources/" rel="section"><i class="download fa-fw"></i>资源</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/08/15/AOP/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="河马">
+      <meta itemprop="description" content="运气也是成功的一部分">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="河马窝苑">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          AOP
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-08-15 19:17:58 / 修改时间：19:32:31" itemprop="dateCreated datePublished" datetime="2023-08-15T19:17:58+08:00">2023-08-15</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.9k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="AOP：在方法之前和之后做一些增强的"><a href="#AOP：在方法之前和之后做一些增强的" class="headerlink" title="AOP：在方法之前和之后做一些增强的"></a>AOP：在方法之前和之后做一些增强的</h2><p>Aspect Oriented Programming(面向切面编程、面向方面编程)，就是面向特定的方法编程<br><img src="https://cdn.nlark.com/yuque/0/2023/png/35579562/1682409572652-5761bb3d-d5aa-4105-9fba-986049e7ab51.png#averageHue=%23f6e7e4&clientId=ua2da27cf-83d9-4&from=drop&id=ub9331b09&originHeight=713&originWidth=1408&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=626096&status=done&style=none&taskId=u52562d6e-bb19-49f8-8493-c14f5df7444&title=" alt="aop概念.png"></p>
+<h2 id="场景："><a href="#场景：" class="headerlink" title="场景："></a>场景：</h2><p>记录操作日志<br>权限控制<br>事务管理</p>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>动态代理是面向切面编程最主流的实现。而SpringAOP是Spring框架的高级技术，旨在管理bean对象的过程中，主要通过底层的<strong>动态代理</strong>机制，对特定的方法进行编程。</p>
+<h3 id="aop面向切面编程案例："><a href="#aop面向切面编程案例：" class="headerlink" title="aop面向切面编程案例："></a>aop面向切面编程案例：</h3><p>@Aspect  表示是一个切面类</p>
+<h3 id=""><a href="#" class="headerlink" title=""></a><img src="https://cdn.nlark.com/yuque/0/2023/png/35579562/1682409198758-2aa118d3-9813-477c-aba1-3acc3ddcb400.png#averageHue=%23fcfcfb&clientId=ua2da27cf-83d9-4&from=drop&id=u28634f14&originHeight=705&originWidth=839&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=276162&status=done&style=none&taskId=u730bd731-b13f-47e4-9dc4-09225e21e57&title=" alt="aop.png"></h3><p>如果说切入点表达式重复可以将其抽取出来； 用**@Pointcut**注解<br><img src="https://cdn.nlark.com/yuque/0/2023/png/35579562/1682411237511-6526c273-f095-4acb-a8e3-d190c063ccac.png#averageHue=%23eeefe4&clientId=u14b963f4-ee70-4&from=drop&id=ua4be4534&originHeight=80&originWidth=759&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=43221&status=done&style=none&taskId=u3abdbacc-f442-42d3-a18c-13f271d8e00&title=" alt="切入点表达式抽取.png"></p>
+<h2 id="AOP切面位置"><a href="#AOP切面位置" class="headerlink" title="AOP切面位置"></a>AOP切面位置</h2><p>过滤器，拦截器，AOP执行流程<br><img src="https://cdn.nlark.com/yuque/0/2023/png/35579562/1682477716143-2ad624d8-74d3-485d-a86d-f0e751d2119d.png#averageHue=%23f7e2d5&clientId=ubc2c7572-1662-4&from=drop&id=r8D7p&originHeight=538&originWidth=1479&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=41140&status=done&style=none&taskId=u20be77d4-dd31-4132-9820-e4a4ee959da&title=" alt="image.png"></p>
+<h2 id="优势"><a href="#优势" class="headerlink" title="优势"></a>优势</h2><ol>
+<li>代码无侵入</li>
+<li>减少重复代码</li>
+<li>提高开发效率</li>
+<li>维护方便</li>
+</ol>
+<h2 id="AOP进阶"><a href="#AOP进阶" class="headerlink" title="AOP进阶"></a>AOP进阶</h2><h3 id="通知类型"><a href="#通知类型" class="headerlink" title="通知类型"></a>通知类型</h3><p>@Around（重点）</p>
+<h3 id="-1"><a href="#-1" class="headerlink" title=""></a><img src="https://cdn.nlark.com/yuque/0/2023/png/35579562/1682410288334-724341ae-7980-487c-8412-e13067a31a03.png#averageHue=%23efeaea&clientId=u14b963f4-ee70-4&from=drop&id=ucd576e7f&originHeight=335&originWidth=1017&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=185306&status=done&style=none&taskId=u7936dfde-8db7-4079-9c89-56f51fb3b6e&title=" alt="通知类型.png"></h3><p><img src="https://cdn.nlark.com/yuque/0/2023/png/35579562/1682411046052-7a17e20e-d96d-48e0-93de-493115957249.png#averageHue=%23f1eded&clientId=u14b963f4-ee70-4&from=drop&id=eTqj2&originHeight=170&originWidth=1296&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=89547&status=done&style=none&taskId=u78ad03a3-be21-4213-a49b-2b905b5dc15&title=" alt="note.png"></p>
+<h3 id="通知顺序"><a href="#通知顺序" class="headerlink" title="通知顺序"></a>通知顺序</h3><p><img src="https://cdn.nlark.com/yuque/0/2023/png/35579562/1682412108227-51eabcc1-8bbc-4707-9664-cd6d6e6c2506.png#averageHue=%23f1e7e6&clientId=u14b963f4-ee70-4&from=drop&id=ue15565d6&originHeight=358&originWidth=576&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=139057&status=done&style=none&taskId=u9864f35b-f353-4061-9f3d-7e82815c6a3&title=" alt="执行顺序.png"></p>
+<h3 id="切入点表达式"><a href="#切入点表达式" class="headerlink" title="切入点表达式"></a>切入点表达式</h3><p>描述切入点方法的一种表达式<br>作用：主要用来决定项目中的哪些方法需要加入通知<br>常见形式：<br>1.execution(……)：根据方法的签名来匹配<br>2.@annotation(……)：根据注解匹配</p>
+<h4 id="切入点表达式-execution"><a href="#切入点表达式-execution" class="headerlink" title="切入点表达式-execution"></a>切入点表达式-execution</h4><p>execution 主要根据方法的返回值、包名、类名、方法名、方法参数等信息来匹配，语法为：<br>:::info<br>execution(访问修饰符?  返回值  包名.类名.?方法名(方法参数) throws 异常?)<br>:::<br>其中带 ?的表示可以省略的部分<br>访问修饰符：可省略（比如: public、protected）<br>包名.类名： 可省略<br>throws 异常：可省略（注意是方法上声明抛出的异常，不是实际抛出的异常）<br>可以使用通配符描述切入点<br>***** ：单个独立的任意符号，可以通配任意返回值、包名、类名、方法名、任意类型的一个参数，也可以通配包、类、方法名的一部分<br>:::info<br>execution(* com.<em>.service.</em>.update*(<em>))<br>:::<br><strong>..</strong> ：多个连续的任意符号，可以通配任意层级的包，或任意类型、任意个数的参数<br>:::info<br>execution(</em> com.itheima..DeptService.*(..))<br>:::</p>
+<p>注意：根据业务需要，可以使用 且（&amp;&amp;）、或（||）、非（!） 来组合比较复杂的切入点表达式。</p>
+<h4 id="切入点表达式-annotation"><a href="#切入点表达式-annotation" class="headerlink" title="切入点表达式-@annotation"></a>切入点表达式-@annotation</h4><p>@annotation 切入点表达式，用于匹配标识有特定注解的方法。<br>:::info<br>@annotation(com.itheima.anno.Log)<br>:::</p>
+<h3 id="连接点"><a href="#连接点" class="headerlink" title="连接点"></a>连接点</h3><p>在Spring中用JoinPoint抽象了连接点，用它可以获得方法执行时的相关信息，如目标类名、方法名、方法参数等<br>对于 @Around 通知，获取连接点信息只能使用  ProceedingJoinPoint</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Around(&quot;execution(* com.itheima.service.DeptService.*(..))&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> Object <span class="title function_">around</span><span class="params">(ProceedingJoinPoint joinPoint)</span> <span class="keyword">throws</span> Throwable &#123;</span><br><span class="line">		<span class="type">String</span> <span class="variable">className</span> <span class="operator">=</span> joinPoint.getTarget().getClass().getName(); <span class="comment">//获取目标类名</span></span><br><span class="line">        <span class="type">Signature</span> <span class="variable">signature</span> <span class="operator">=</span> joinPoint.getSignature(); <span class="comment">//获取目标方法签名</span></span><br><span class="line">        <span class="type">String</span> <span class="variable">methodName</span> <span class="operator">=</span> joinPoint.getSignature().getName(); <span class="comment">//获取目标方法名</span></span><br><span class="line">        Object[] args = joinPoint.getArgs(); <span class="comment">//获取目标方法运行参数 </span></span><br><span class="line">        <span class="type">Object</span> <span class="variable">res</span> <span class="operator">=</span> joinPoint.proceed(); <span class="comment">//执行原始方法,获取返回值（环绕通知）</span></span><br><span class="line">		<span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>对于其他四种通知，获取连接点信息只能使用 JoinPoint ，它是 ProceedingJoinPoint 的父类型</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Before(&quot;execution(* com.itheima.service.DeptService.*(..))&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">before</span><span class="params">(JoinPoint joinPoint)</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">className</span> <span class="operator">=</span> joinPoint.getTarget().getClass().getName(); <span class="comment">//获取目标类名</span></span><br><span class="line">		<span class="type">Signature</span> <span class="variable">signature</span> <span class="operator">=</span> joinPoint.getSignature(); <span class="comment">//获取目标方法签名</span></span><br><span class="line">		<span class="type">String</span> <span class="variable">methodName</span> <span class="operator">=</span> joinPoint.getSignature().getName(); <span class="comment">//获取目标方法名</span></span><br><span class="line">		Object[] args = joinPoint.getArgs(); <span class="comment">//获取目标方法运行参数 </span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>河马
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://example.com/2023/08/15/AOP/" title="AOP">http://example.com/2023/08/15/AOP/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+ 
+   <div>
+     <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:24px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+   </div>
+ 
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/08/15/SpringBoot%E5%8E%9F%E7%90%86/" rel="prev" title="SpringBoot原理">
+      <i class="fa fa-chevron-left"></i> SpringBoot原理
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/08/15/ThreadLocal%E7%94%A8%E6%B3%95/" rel="next" title="ThreadLocal">
+      ThreadLocal <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#AOP%EF%BC%9A%E5%9C%A8%E6%96%B9%E6%B3%95%E4%B9%8B%E5%89%8D%E5%92%8C%E4%B9%8B%E5%90%8E%E5%81%9A%E4%B8%80%E4%BA%9B%E5%A2%9E%E5%BC%BA%E7%9A%84"><span class="nav-number">1.</span> <span class="nav-text">AOP：在方法之前和之后做一些增强的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF%EF%BC%9A"><span class="nav-number">2.</span> <span class="nav-text">场景：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0"><span class="nav-number">3.</span> <span class="nav-text">实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#aop%E9%9D%A2%E5%90%91%E5%88%87%E9%9D%A2%E7%BC%96%E7%A8%8B%E6%A1%88%E4%BE%8B%EF%BC%9A"><span class="nav-number">3.1.</span> <span class="nav-text">aop面向切面编程案例：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.2.</span> <span class="nav-text"></span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AOP%E5%88%87%E9%9D%A2%E4%BD%8D%E7%BD%AE"><span class="nav-number">4.</span> <span class="nav-text">AOP切面位置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%98%E5%8A%BF"><span class="nav-number">5.</span> <span class="nav-text">优势</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AOP%E8%BF%9B%E9%98%B6"><span class="nav-number">6.</span> <span class="nav-text">AOP进阶</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%9A%E7%9F%A5%E7%B1%BB%E5%9E%8B"><span class="nav-number">6.1.</span> <span class="nav-text">通知类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#-1"><span class="nav-number">6.2.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%9A%E7%9F%A5%E9%A1%BA%E5%BA%8F"><span class="nav-number">6.3.</span> <span class="nav-text">通知顺序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%87%E5%85%A5%E7%82%B9%E8%A1%A8%E8%BE%BE%E5%BC%8F"><span class="nav-number">6.4.</span> <span class="nav-text">切入点表达式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%87%E5%85%A5%E7%82%B9%E8%A1%A8%E8%BE%BE%E5%BC%8F-execution"><span class="nav-number">6.4.1.</span> <span class="nav-text">切入点表达式-execution</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%87%E5%85%A5%E7%82%B9%E8%A1%A8%E8%BE%BE%E5%BC%8F-annotation"><span class="nav-number">6.4.2.</span> <span class="nav-text">切入点表达式-@annotation</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9E%E6%8E%A5%E7%82%B9"><span class="nav-number">6.5.</span> <span class="nav-text">连接点</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="河马"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">河马</p>
+  <div class="site-description" itemprop="description">运气也是成功的一部分</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">20</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/hippoasleep" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;hippoasleep" rel="noopener" target="_blank"><i class="github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:JLhippo@163.com" title="E-Mail → mailto:JLhippo@163.com" rel="noopener" target="_blank"><i class="envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="link fa-fw"></i>
+      链接网站
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://baidu.com/" title="https:&#x2F;&#x2F;baidu.com" rel="noopener" target="_blank">百度</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2023-08 – 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">河马</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">99k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">1:30</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+    <span id="busuanzi_container_site_pv">总访问量<span id="busuanzi_value_site_pv"></span>次</span>
+    <span class="post-meta-divider">|</span>
+    <span id="busuanzi_container_site_uv">总访客数<span id="busuanzi_value_site_uv"></span>人</span>
+    <span class="post-meta-divider">|</span>
+<!-- 不蒜子计数初始值纠正 -->
+<script>
+$(document).ready(function() {
+
+    var int = setInterval(fixCount, 50);  // 50ms周期检测函数
+    var countOffset = 20000;  // 初始化首次数据
+
+    function fixCount() {            
+       if (document.getElementById("busuanzi_container_site_pv").style.display != "none")
+        {
+            $("#busuanzi_value_site_pv").html(parseInt($("#busuanzi_value_site_pv").html()) + countOffset); 
+            clearInterval(int);
+        }                  
+        if ($("#busuanzi_container_site_pv").css("display") != "none")
+        {
+            $("#busuanzi_value_site_uv").html(parseInt($("#busuanzi_value_site_uv").html()) + countOffset); // 加上初始数据 
+            clearInterval(int); // 停止检测
+        }  
+    }
+       	
+});
+</script> 
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="JDBC( Java DataBase Connectivity )，就是使用Java语言操作关系型数据库的一套API。 步骤加连编执释   1. 注册驱动   2. 获取连接对象   3. 执行SQL语句，返回执行结果   4. 处理执行结果   5. 释放资源  MyBatis入门一款优秀的持久层的框架，用于简化JDBC的开发 使用步骤1）引入起步依赖与驱动123456789&lt;depen">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mybatis">
+<meta property="og:url" content="http://example.com/2023/08/15/Mybatis/index.html">
+<meta property="og:site_name" content="河马窝苑">
+<meta property="og:description" content="JDBC( Java DataBase Connectivity )，就是使用Java语言操作关系型数据库的一套API。 步骤加连编执释   1. 注册驱动   2. 获取连接对象   3. 执行SQL语句，返回执行结果   4. 处理执行结果   5. 释放资源  MyBatis入门一款优秀的持久层的框架，用于简化JDBC的开发 使用步骤1）引入起步依赖与驱动123456789&lt;depen">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/35579562/1681956405792-ff58397c-c92c-44ee-9156-8e82557eaf46.png#averageHue=%23fcfcfb&clientId=uf727bb4a-20e0-4&from=drop&id=u5e7c33c1&originHeight=374&originWidth=1059&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=236037&status=done&style=none&taskId=u568e3b5a-8c3c-45f6-9e18-593e7f55491&title=">
+<meta property="article:published_time" content="2023-08-15T11:18:43.225Z">
+<meta property="article:modified_time" content="2023-08-15T11:32:50.843Z">
+<meta property="article:author" content="河马">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.nlark.com/yuque/0/2023/png/35579562/1681956405792-ff58397c-c92c-44ee-9156-8e82557eaf46.png#averageHue=%23fcfcfb&clientId=uf727bb4a-20e0-4&from=drop&id=u5e7c33c1&originHeight=374&originWidth=1059&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=236037&status=done&style=none&taskId=u568e3b5a-8c3c-45f6-9e18-593e7f55491&title=">
+
+<link rel="canonical" href="http://example.com/2023/08/15/Mybatis/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Mybatis | 河马窝苑</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">河马窝苑</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-resources">
+
+    <a href="/resources/" rel="section"><i class="download fa-fw"></i>资源</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/08/15/Mybatis/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="河马">
+      <meta itemprop="description" content="运气也是成功的一部分">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="河马窝苑">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Mybatis
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-08-15 19:18:43 / 修改时间：19:32:50" itemprop="dateCreated datePublished" datetime="2023-08-15T19:18:43+08:00">2023-08-15</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>17k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>16 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="JDBC"><a href="#JDBC" class="headerlink" title="JDBC"></a>JDBC</h1><p>( Java DataBase Connectivity )，就是使用Java语言操作关系型数据库的一套API。</p>
+<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><p>加连编执释</p>
+<pre><code>  1. 注册驱动
+  2. 获取连接对象
+  3. 执行SQL语句，返回执行结果
+  4. 处理执行结果
+  5. 释放资源
+</code></pre>
+<h1 id="MyBatis入门"><a href="#MyBatis入门" class="headerlink" title="MyBatis入门"></a>MyBatis入门</h1><p>一款优秀的<strong>持久层</strong>的框架，用于简化JDBC的开发</p>
+<h2 id="使用步骤"><a href="#使用步骤" class="headerlink" title="使用步骤"></a>使用步骤</h2><h4 id="1）引入起步依赖与驱动"><a href="#1）引入起步依赖与驱动" class="headerlink" title="1）引入起步依赖与驱动"></a>1）引入起步依赖与驱动</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;org.mybatis.spring.boot&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;mybatis-spring-boot-starter&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;2.2.2&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;mysql&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;mysql-connector-java&lt;/artifactId&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+<h4 id="2）创建与表对应的实体类"><a href="#2）创建与表对应的实体类" class="headerlink" title="2）创建与表对应的实体类"></a>2）创建与表对应的实体类</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">public class Members &#123;</span><br><span class="line">    private Integer id;</span><br><span class="line">    private String nickname;</span><br><span class="line">    private String phone;</span><br><span class="line">    private String gender;</span><br><span class="line">    private String email;</span><br><span class="line">    ///...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="3）配置数据库连接-application-yml"><a href="#3）配置数据库连接-application-yml" class="headerlink" title="3）配置数据库连接 application.yml"></a>3）配置数据库连接 application.yml</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">spring:</span><br><span class="line">  datasource:</span><br><span class="line">    url: jdbc:mysql://127.0.0.1:3306/jd_base</span><br><span class="line">    driver-class-name: com.mysql.cj.jdbc.Driver</span><br><span class="line">    username: root</span><br><span class="line">    password: root</span><br></pre></td></tr></table></figure>
+<h4 id="4）开发DAO层代码-接口"><a href="#4）开发DAO层代码-接口" class="headerlink" title="4）开发DAO层代码(接口)"></a>4）开发DAO层代码(接口)</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">import com.heima.basic.pojos.Members;</span><br><span class="line">import org.apache.ibatis.annotations.Mapper;</span><br><span class="line">import org.apache.ibatis.annotations.Select;</span><br><span class="line"></span><br><span class="line">import java.util.List;</span><br><span class="line"></span><br><span class="line">//声明是一个DAO层的代理对象（MembersMapper） bean，放到spring容器中</span><br><span class="line">@Mapper</span><br><span class="line">public interface MembersMapper &#123;</span><br><span class="line"></span><br><span class="line">    //书写SQL select * from jd_members</span><br><span class="line">    @Select(&quot;select id,nickname, phone, gender, email  from jd_members&quot;)</span><br><span class="line">    List&lt;Members&gt; findAll();</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="5）测试"><a href="#5）测试" class="headerlink" title="5）测试"></a>5）测试</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">import com.heima.basic.dao.MembersMapper;</span><br><span class="line">import com.heima.basic.pojos.Members;</span><br><span class="line">import org.junit.jupiter.api.Test;</span><br><span class="line">import org.springframework.beans.factory.annotation.Autowired;</span><br><span class="line">import org.springframework.boot.test.context.SpringBootTest;</span><br><span class="line"></span><br><span class="line">import java.util.List;</span><br><span class="line"></span><br><span class="line">@SpringBootTest</span><br><span class="line">public class MyBatisTest &#123;</span><br><span class="line"></span><br><span class="line">    @Autowired</span><br><span class="line">    private MembersMapper membersMapper;</span><br><span class="line"></span><br><span class="line">    @Test</span><br><span class="line">    void testFindAll()&#123;</span><br><span class="line">        List&lt;Members&gt; result = membersMapper.findAll();</span><br><span class="line">        System.out.println(result);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="数据库连接池"><a href="#数据库连接池" class="headerlink" title="数据库连接池"></a>数据库连接池</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">是一个容器，负责分配、管理数据库连接（Connection）</span><br><span class="line">优势：资源复用、提升系统响应速度</span><br><span class="line">接口：DataSource</span><br><span class="line">产品：C3P0、DBCP、Druid、Hikari</span><br></pre></td></tr></table></figure>
+<h2 id="bug"><a href="#bug" class="headerlink" title="bug"></a>bug</h2><h3 id="1、密码错误"><a href="#1、密码错误" class="headerlink" title="1、密码错误"></a>1、密码错误</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java.sql.SQLException: Access denied <span class="keyword">for</span> <span class="keyword">user</span> <span class="string">&#x27;root&#x27;</span>@<span class="string">&#x27;localhost&#x27;</span> (<span class="keyword">using</span> password: YES)</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">spring:</span><br><span class="line">  datasource:</span><br><span class="line">    url: jdbc:mysql://127.0.0.1:3306/jd_base</span><br><span class="line">    driver-class-name: com.mysql.cj.jdbc.Driver</span><br><span class="line">    username: root</span><br><span class="line">    password: &quot;0516&quot;  #查看是否你的密码 0516  ==&gt;  &quot;0516&quot;</span><br></pre></td></tr></table></figure>
+<h3 id="2、空指针"><a href="#2、空指针" class="headerlink" title="2、空指针"></a>2、空指针</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">java.lang.NullPointerException</span><br><span class="line">    at hello.MyBatisTest.testFindAll(MyBatisTest.java:23)</span><br></pre></td></tr></table></figure>
+<p>@Test注解一定要是junit5版本。如果是junit4版本则会出现注入失败的问题 ，出现null</p>
+<h3 id="3、测试类无法启动"><a href="#3、测试类无法启动" class="headerlink" title="3、测试类无法启动"></a>3、测试类无法启动</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">java.lang.IllegalStateException: Unable to find a </span><br><span class="line">@SpringBootConfiguration, you need to use </span><br><span class="line">@ContextConfiguration or </span><br><span class="line">@SpringBootTest(classes=...) </span><br><span class="line">with your test</span><br><span class="line">at </span><br><span class="line">org.springframework.util.Assert.state(Assert.java:76)</span><br></pre></td></tr></table></figure>
+<h1 id=""><a href="#" class="headerlink" title=""></a></h1><h1 id="MyBatis基础应用"><a href="#MyBatis基础应用" class="headerlink" title="MyBatis基础应用"></a>MyBatis基础应用</h1><h2 id="XML映射文件开发模式"><a href="#XML映射文件开发模式" class="headerlink" title="XML映射文件开发模式"></a>XML映射文件开发模式</h2><h3 id="使用步骤-1"><a href="#使用步骤-1" class="headerlink" title="使用步骤"></a>使用步骤</h3><p>基于入门步骤创建接口：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">@Mapper //此注解是ibatis提供的，底层会自动为接口创建一个对象(动态代理对象),并将对象放到spring容器中</span><br><span class="line">public interface MembersMapper &#123;</span><br><span class="line">    //不再使用注解方式</span><br><span class="line">    List&lt;Members&gt; findAll();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="XML的使用方式"><a href="#XML的使用方式" class="headerlink" title="XML的使用方式"></a>XML的使用方式</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">方式一</span><br><span class="line">	映射xml文件与接口同路径、同名</span><br><span class="line"></span><br><span class="line">方式二</span><br><span class="line">	手动添加XML映射文件扫描</span><br><span class="line">  	1）在application.yml添加</span><br><span class="line">    	mybatis:</span><br><span class="line">    		mapper-locations: classpath:/mapper/*Mapper.xml</span><br><span class="line">  	2）在resources目录下创建XML映射文件</span><br></pre></td></tr></table></figure>
+
+<h3 id="BUG"><a href="#BUG" class="headerlink" title="BUG"></a>BUG</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">org.apache.ibatis.binding.BindingException: </span><br><span class="line">    Invalid bound statement (not found): </span><br><span class="line">com.heima.full.mapper.MembersMapper.findAll</span><br></pre></td></tr></table></figure>
+<p><strong>Invalid bound statement (not found)</strong><br>解决思路：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1)查看com.heima.full.mapper.MembersMapper接口 有没有对应的XML中namespace</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">2)查看findAll方法名在xml文件中是否有id对应</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">3)采用xml与接口同路径、同名模式的话，查看目录是否一致！</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">4)检查xml中标签的属性值是否手欠多加了空格等非法字符</span><br></pre></td></tr></table></figure>
+<h3 id="简化-Mapper注解的使用"><a href="#简化-Mapper注解的使用" class="headerlink" title="简化@Mapper注解的使用"></a>简化@Mapper注解的使用</h3><p>在启动类上添加注解</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">@SpringBootApplication</span><br><span class="line">@MapperScan(&quot;mapper接口所在的包路径&quot;)</span><br><span class="line">public class MyBatisUsedApp &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        SpringApplication.run(MyBatisUsedApp.class, args);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="lombok使用"><a href="#lombok使用" class="headerlink" title="lombok使用"></a>lombok使用</h3><table>
+<thead>
+<tr>
+<th><strong>注解</strong></th>
+<th><strong>作用</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>@Getter&#x2F;@Setter</td>
+<td>为所有的属性提供get&#x2F;set方法</td>
+</tr>
+<tr>
+<td>@ToString</td>
+<td>会给类自动生成易阅读的 toString 方法</td>
+</tr>
+<tr>
+<td>@EqualsAndHashCode</td>
+<td>根据类所拥有的非静态字段自动重写 equals 方法和 hashCode 方法</td>
+</tr>
+<tr>
+<td>@Data</td>
+<td>提供了更综合的生成代码功能（@Getter + @Setter + @ToString + @EqualsAndHashCode）</td>
+</tr>
+<tr>
+<td>@NoArgsConstructor</td>
+<td>为实体类生成无参的构造器方法</td>
+</tr>
+<tr>
+<td>@AllArgsConstructor</td>
+<td>为实体类生成除了static修饰的字段之外带有各参数的构造器方法。</td>
+</tr>
+<tr>
+<td>@Slf4j</td>
+<td>基于Slf4j找实现日志框架（springboot中默认自带logback）</td>
+</tr>
+</tbody></table>
+<h4 id="使用步骤-2"><a href="#使用步骤-2" class="headerlink" title="使用步骤"></a>使用步骤</h4><h5 id="1）在pom-xml文件中引入依赖"><a href="#1）在pom-xml文件中引入依赖" class="headerlink" title="1）在pom.xml文件中引入依赖"></a>1）在pom.xml文件中引入依赖</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 在springboot的父工程中，已经集成了lombok并指定了版本号，故当前引入依赖时不需要指定version --&gt;</span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;org.projectlombok&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;lombok&lt;/artifactId&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+<h5 id="2）在实体类上添加注解"><a href="#2）在实体类上添加注解" class="headerlink" title="2）在实体类上添加注解"></a>2）在实体类上添加注解</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">import lombok.Data;</span><br><span class="line"></span><br><span class="line">@Data</span><br><span class="line">public class User &#123;</span><br><span class="line">    private Integer id;</span><br><span class="line">    //...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在实体类上添加了@Data注解，那么这个类在编译时期，就会生成getter&#x2F;setter、equals、hashcode、toString等方法。</p>
+<h2 id="XML映射文件的CRUD"><a href="#XML映射文件的CRUD" class="headerlink" title="XML映射文件的CRUD"></a>XML映射文件的CRUD</h2><h3 id="查询练习标签"><a href="#查询练习标签" class="headerlink" title="查询练习标签"></a>查询练习<select>标签</h3><h4 id="1、基于ID进行查询"><a href="#1、基于ID进行查询" class="headerlink" title="1、基于ID进行查询"></a>1、基于ID进行查询</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--    根据id查member--&gt;</span><br><span class="line">    &lt;select id=&quot;findById&quot; resultType=&quot;com.heima.full.pojos.Members&quot;&gt;</span><br><span class="line">        select id,nickname, phone, gender, email from jd_members</span><br><span class="line">        where id = #&#123;id&#125;</span><br><span class="line">    &lt;/select&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Members findById(Integer id);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">//根据Id查询</span><br><span class="line">    @Test</span><br><span class="line">    void testFindById()&#123;</span><br><span class="line">        Members byId = membersMapper.findById(1);</span><br><span class="line">        System.out.println(byId);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2、基于查询条件练习"><a href="#2、基于查询条件练习" class="headerlink" title="2、基于查询条件练习"></a>2、基于查询条件练习</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--    根据性别和email查member--&gt;</span><br><span class="line">    &lt;select id=&quot;findByGenderAndEmail&quot; resultType=&quot;com.heima.full.pojos.Members&quot;&gt;</span><br><span class="line">        select id,nickname, phone, gender, email from jd_members</span><br><span class="line">        where gender = #&#123;gender&#125; and email = #&#123;email&#125;</span><br><span class="line">    &lt;/select&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">//根据性别和邮箱查询（可能重复）查询用户</span><br><span class="line">    List&lt;Members&gt; findByGenderAndEmail(</span><br><span class="line">            @Param(&quot;gender&quot;) String gender,</span><br><span class="line">            @Param(&quot;email&quot;) String email</span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">//根据gender和email（可能重复）查询用户</span><br><span class="line">    @Test</span><br><span class="line">    void testFindByGenderAndEmail()&#123;</span><br><span class="line">        List&lt;Members&gt; byGenderAndEmail = membersMapper.findByGenderAndEmail(&quot;1&quot;,&quot;guangzhiguo@itcast.cn&quot;);</span><br><span class="line">        System.out.println(byGenderAndEmail);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="新增练习标签"><a href="#新增练习标签" class="headerlink" title="新增练习标签"></a>新增练习<insert>标签</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--    插入member--&gt;           主键返回↓</span><br><span class="line">    &lt;insert id=&quot;insertMember&quot; useGeneratedKeys=&quot;true&quot; keyProperty=&quot;id&quot;&gt;</span><br><span class="line">        INSERT INTO jd_members(nickname,gender,phone,email)</span><br><span class="line">        VALUES (#&#123;nickname&#125;,#&#123;gender&#125;,#&#123;phone&#125;,#&#123;email&#125;)</span><br><span class="line">    &lt;/insert&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">//insert</span><br><span class="line">    int insertMember(Members member);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">//插入member</span><br><span class="line">    @Test</span><br><span class="line">    void testInsertMember()&#123;</span><br><span class="line">        Members member = new Members();</span><br><span class="line">        member.setNickname(&quot;欧尼酱&quot;);</span><br><span class="line">        member.setGender(&quot;2&quot;);</span><br><span class="line">        member.setPhone(&quot;120130&quot;);</span><br><span class="line">        member.setEmail(&quot;huluwa@itcast.cn&quot;);</span><br><span class="line">        int i = membersMapper.insertMember(member);</span><br><span class="line">        System.out.println(i);</span><br><span class="line">        System.out.println(member.getId());</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="更新练习标签"><a href="#更新练习标签" class="headerlink" title="更新练习标签"></a>更新练习<update>标签</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--    更新member--&gt;</span><br><span class="line">    &lt;update id=&quot;updateMember&quot;&gt;</span><br><span class="line">        UPDATE jd_members SET nickname=#&#123;nickname&#125; WHERE gender=#&#123;gender&#125; AND phone =#&#123;phone&#125;</span><br><span class="line">    &lt;/update&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">//update</span><br><span class="line">int updateMember(Members member);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">//更新member</span><br><span class="line">    @Test</span><br><span class="line">    void testupdateMember()&#123;</span><br><span class="line">        Members member = new Members();</span><br><span class="line">        member.setNickname(&quot;欧鸡酱&quot;);</span><br><span class="line">        member.setGender(&quot;2&quot;);</span><br><span class="line">        member.setPhone(&quot;120130&quot;);</span><br><span class="line">        int i = membersMapper.updateMember(member);</span><br><span class="line">        System.out.println(i);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="删除练习标签"><a href="#删除练习标签" class="headerlink" title="删除练习标签"></a>删除练习<delete>标签</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--    删除member--&gt;</span><br><span class="line">    &lt;delete id=&quot;deleteMember&quot;&gt;</span><br><span class="line">        DELETE FROM jd_members WHERE nickname=#&#123;nickname&#125; OR gender=#&#123;gender&#125;</span><br><span class="line">    &lt;/delete&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">//delete</span><br><span class="line">    int deleteMember(Members member);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">//删除</span><br><span class="line">    @Test</span><br><span class="line">    void testDeleteMember()&#123;</span><br><span class="line">        Members member = new Members();</span><br><span class="line">        member.setNickname(&quot;欧鸡酱&quot;);</span><br><span class="line">        member.setGender(&quot;1&quot;);</span><br><span class="line">        int i = membersMapper.deleteMember(member);</span><br><span class="line">        System.out.println(i);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="标签属性-参数数量小结"><a href="#标签属性-参数数量小结" class="headerlink" title="标签属性&amp;参数数量小结"></a>标签属性&amp;参数数量小结</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;select id=&quot;接口的方法名&quot;</span><br><span class="line">        resultType=&quot;SQL查询结果集中【每行】数据想映射给的对象类型&quot; 查询中resultType/resultMap必须指定!!!</span><br><span class="line">        resultMap=&quot;手动指定映射规则&quot;</span><br><span class="line">        statementType=&quot;CALLABLE&quot; 一般采用默认的STATEMENT; CALLABLE表示标签中的SQL是调用存储过程的SQL call 存储过程名();</span><br><span class="line">        &gt;&lt;/select&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;insert id=&quot;insertMem&quot;</span><br><span class="line">        useGeneratedKeys=&quot;true&quot; 利用数据库表的自增获取ID</span><br><span class="line">        keyProperty=&quot;id&quot; 获得id后，赋值给入参对象的id属性</span><br><span class="line">        &gt;&lt;/insert&gt;</span><br><span class="line">&lt;update&gt;&lt;/update&gt;</span><br><span class="line">&lt;delete&gt;&lt;/delete&gt;</span><br></pre></td></tr></table></figure>
+<p>参数数量：<br>1）单个参数</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">//1.基本类型 在接口中如何取值？ #&#123;见名知意的字符串&#125;</span><br><span class="line">Members findById(Integer id);</span><br><span class="line">//2.对象类型 在接口中如何取值？ #&#123;对象的属性名&#125;</span><br><span class="line">List&lt;Members&gt; findByGenderAndEmail(Members searchParam);</span><br></pre></td></tr></table></figure>
+<p>2）多个参数，建议多参数添加@Param注解指定参数名</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Integer updataMemberByPhoneAndGender(@Param(&quot;phone&quot;) String phone,</span><br><span class="line">                                     @Param(&quot;gender&quot;) String gender,</span><br><span class="line">                                     @Param(&quot;nickname&quot;) String nickname1);</span><br><span class="line">// 取值 #&#123;phone&#125;</span><br><span class="line">//原理是底层 map = new HashMap();  map.put(&quot;phone&quot;,phone);</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;update id=&quot;updataMemberByPhoneAndGender&quot;&gt;</span><br><span class="line">    UPDATE jd_members set nickname = #&#123;nickname&#125; where phone = #&#123;phone&#125; and gender =#&#123;gender&#125;</span><br><span class="line">    </span><br><span class="line">    #&#123;phone&#125; == map.get(&quot;phone&quot;)</span><br><span class="line">&lt;/update&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Integer updataMemberByPhoneAndGender02(@Param(&quot;phone&quot;) String phone,</span><br><span class="line">                                       @Param(&quot;member&quot;) Members members);</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;update id=&quot;updataMemberByPhoneAndGender02&quot;&gt;</span><br><span class="line">    UPDATE jd_members set nickname = #&#123;member.nickname&#125; where phone = #&#123;phone&#125; and gender = #&#123;member.gender&#125;</span><br><span class="line">&lt;/update&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="mybatis字段名、属性名不对应问题"><a href="#mybatis字段名、属性名不对应问题" class="headerlink" title="mybatis字段名、属性名不对应问题"></a>mybatis字段名、属性名不对应问题</h2><h3 id="方式一：起别名"><a href="#方式一：起别名" class="headerlink" title="方式一：起别名"></a>方式一：起别名</h3><p>方式二：手动指定映射关系<br><img src="https://cdn.nlark.com/yuque/0/2023/png/35579562/1681956405792-ff58397c-c92c-44ee-9156-8e82557eaf46.png#averageHue=%23fcfcfb&clientId=uf727bb4a-20e0-4&from=drop&id=u5e7c33c1&originHeight=374&originWidth=1059&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=236037&status=done&style=none&taskId=u568e3b5a-8c3c-45f6-9e18-593e7f55491&title=" alt="1.png"></p>
+<h3 id="方式三：配置yml文件-驼峰命名支持"><a href="#方式三：配置yml文件-驼峰命名支持" class="headerlink" title="方式三：配置yml文件 驼峰命名支持"></a>方式三：配置yml文件 驼峰命名支持</h3><p>mybatis支持驼峰命名规范，数据库表字段命名为create_time，类中属性名可以声明为createTime</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">mybatis:</span></span><br><span class="line">	<span class="attr">mapper-locations:</span> <span class="string">classpath:/mapper/*Mapper.xml</span></span><br><span class="line">	<span class="attr">configuration:</span></span><br><span class="line">		<span class="attr">log-impl:</span> <span class="string">org.apache.ibatis.logging.stdout.StdOutImpl</span></span><br><span class="line">		<span class="comment">#开发驼峰命名转换支持</span></span><br><span class="line">		<span class="attr">map-underscore-to-camel-case:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="动态SQL"><a href="#动态SQL" class="headerlink" title="动态SQL"></a>动态SQL</h2><h3 id="1、-foreach循环"><a href="#1、-foreach循环" class="headerlink" title="1、 foreach循环"></a>1、 foreach循环</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--    动态查询--&gt;</span><br><span class="line">    &lt;select id=&quot;findByIds&quot; resultType=&quot;com.heima.full.pojos.Members&quot;&gt;</span><br><span class="line">        select * from jd_members where id in</span><br><span class="line">        &lt;foreach collection=&quot;ids&quot; item=&quot;memid&quot; separator=&quot;,&quot; open=&quot;(&quot; close=&quot;)&quot;&gt;</span><br><span class="line">            #&#123;memid&#125;</span><br><span class="line">        &lt;/foreach&gt;</span><br><span class="line">    &lt;/select&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    //列表list查询</span><br><span class="line">    List&lt;Members&gt; findByIds(List&lt;Integer&gt; ids);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    //动态查询</span><br><span class="line">    @Test</span><br><span class="line">    void testFindByIds()&#123;</span><br><span class="line">        Integer[] arr = &#123;1,2,3,4,5&#125;;</span><br><span class="line">        List&lt;Integer&gt; integers = Arrays.asList(arr);</span><br><span class="line">        List&lt;Members&gt; members = membersMapper.findByIds(integers);</span><br><span class="line">        System.out.println(members);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="2、条件判断if"><a href="#2、条件判断if" class="headerlink" title="2、条件判断if"></a>2、条件判断if</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"> &lt;!--    if查询--&gt;</span><br><span class="line">    &lt;select id=&quot;findIf&quot; resultType=&quot;com.heima.full.pojos.Members&quot;&gt;</span><br><span class="line">        select * from jd_members</span><br><span class="line">        where 1=1</span><br><span class="line">        &lt;if test=&quot;nickname != null and nickname != &#x27;&#x27;&quot;&gt;</span><br><span class="line">            and nickname like #&#123;nickname&#125;</span><br><span class="line">        &lt;/if&gt;</span><br><span class="line">        &lt;if test=&quot;phone != null and phone != &#x27;&#x27;&quot;&gt;</span><br><span class="line">            and phone like #&#123;phone&#125;</span><br><span class="line">        &lt;/if&gt;</span><br><span class="line">        &lt;if test=&quot;gender != null and gender != &#x27;&#x27;&quot;&gt;</span><br><span class="line">            and gender like #&#123;gender&#125;</span><br><span class="line">        &lt;/if&gt;</span><br><span class="line">    &lt;/select&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">//if查询</span><br><span class="line">    List&lt;Members&gt; findIf(Members member);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">//if查询</span><br><span class="line">    @Test</span><br><span class="line">    void testFindIf()&#123;</span><br><span class="line">        Members member = new Members();</span><br><span class="line">        member.setNickname(&quot;迪迦&quot;);</span><br><span class="line">        //member.setPhone(&quot;123123121233&quot;);</span><br><span class="line">        //member.setGender(&quot;2&quot;);</span><br><span class="line">        List&lt;Members&gt; mapperIf = membersMapper.findIf(member);</span><br><span class="line">        System.out.println(mapperIf);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="3、where拼接"><a href="#3、where拼接" class="headerlink" title="3、where拼接"></a>3、where拼接</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">&lt;select id=&quot;findByCondition&quot; resultType=&quot;com.heima.full.pojos.Members&quot;&gt;</span><br><span class="line">        select * from jd_members</span><br><span class="line">&lt;!--        where 1=1 好多余</span><br><span class="line">    使用where优化。 where作用：</span><br><span class="line">        1）拼接where字符串 </span><br><span class="line">        2）自动去掉条件中第一个拼接符 not、and、or</span><br><span class="line">        3）当查询条件没有了，不拼接where关键字了</span><br><span class="line">    --&gt;</span><br><span class="line">        </span><br><span class="line">        &lt;where&gt;</span><br><span class="line">            &lt;if test=&quot;nickname != null and nickname != &#x27;&#x27;&quot;&gt;</span><br><span class="line">    &lt;!--            1. 解决模糊匹配的问题 %拼接 ？ #&#123;&#125; 和 $&#123;&#125; 区别？--&gt;</span><br><span class="line">                and nickname like #&#123;nickname&#125;</span><br><span class="line">            &lt;/if&gt;</span><br><span class="line">            &lt;if test=&quot;phone != null and phone != &#x27;&#x27;&quot;&gt;</span><br><span class="line">                and phone = #&#123;phone&#125;</span><br><span class="line">            &lt;/if&gt;</span><br><span class="line">            &lt;if test=&quot;gender != null and gender != &#x27;&#x27;&quot;&gt;</span><br><span class="line">                and gender = #&#123;gender&#125;</span><br><span class="line">            &lt;/if&gt;</span><br><span class="line">        &lt;/where&gt;</span><br><span class="line">    &lt;/select&gt;</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="4、trim拼接–了解"><a href="#4、trim拼接–了解" class="headerlink" title="4、trim拼接–了解"></a>4、trim拼接–了解</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">&lt;select id=&quot;findByCondition&quot; resultType=&quot;com.heima.full.pojos.Members&quot;&gt;</span><br><span class="line">    select * from jd_members</span><br><span class="line">    &lt;!--       select * from jd_members where nickname like #&#123;nickname&#125;  a</span><br><span class="line">            select * from jd_members where nickname like ? a</span><br><span class="line">--&gt;</span><br><span class="line">    &lt;!--       prefix给SQL拼接添加前缀where</span><br><span class="line">            prefixOverrides 去掉trim中第一个字符串and</span><br><span class="line">            suffix 给SQL结尾添加字符串</span><br><span class="line">            suffixOverrides 去掉最后面的那个字符串</span><br><span class="line"></span><br><span class="line"> --&gt;</span><br><span class="line">    &lt;trim prefix=&quot;where&quot; prefixOverrides=&quot;and&quot; suffix=&quot;&quot; suffixOverrides=&quot;&quot;&gt;</span><br><span class="line">        &lt;if test=&quot;nickname != null and nickname != &#x27;&#x27;&quot;&gt;</span><br><span class="line">            &lt;!--            1. 解决模糊匹配的问题 %拼接 ？ #&#123;&#125; 和 $&#123;&#125; 区别？--&gt;</span><br><span class="line">            and nickname like #&#123;nickname&#125;</span><br><span class="line">        &lt;/if&gt;</span><br><span class="line">        &lt;if test=&quot;phone != null and phone != &#x27;&#x27;&quot;&gt;</span><br><span class="line">            and phone = #&#123;phone&#125;</span><br><span class="line">        &lt;/if&gt;</span><br><span class="line">        &lt;if test=&quot;gender != null and gender != &#x27;&#x27;&quot;&gt;</span><br><span class="line">            and gender = #&#123;gender&#125;</span><br><span class="line">        &lt;/if&gt;</span><br><span class="line">    &lt;/trim&gt;</span><br><span class="line">&lt;/select&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="5、更新字段set–了解"><a href="#5、更新字段set–了解" class="headerlink" title="5、更新字段set–了解"></a>5、更新字段set–了解</h3><h3 id="6、SQL片段-sql-include–了解"><a href="#6、SQL片段-sql-include–了解" class="headerlink" title="6、SQL片段 sql&amp;include–了解"></a>6、SQL片段 sql&amp;include–了解</h3><p>抽取公共SQL语句<sql></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;sql id=&quot;commonColumn&quot;&gt;</span><br><span class="line">        select id,nickname, phone, gender, email from jd_members</span><br><span class="line">    &lt;/sql&gt;</span><br></pre></td></tr></table></figure>
+<p>应用这块公共SQL<include></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;select id=&quot;findById&quot; resultType=&quot;com.heima.full.pojos.Members&quot;&gt;</span><br><span class="line">        &lt;include refid=&quot;commonColumn&quot;&gt;&lt;/include&gt;</span><br><span class="line">        where id = #&#123;id&#125;</span><br><span class="line">    &lt;/select&gt;</span><br></pre></td></tr></table></figure>
+
+<h1 id="mybatis分页插件"><a href="#mybatis分页插件" class="headerlink" title="mybatis分页插件"></a>mybatis分页插件</h1><h2 id="使用步骤-3"><a href="#使用步骤-3" class="headerlink" title="使用步骤"></a>使用步骤</h2><h4 id="1）引入起步依赖"><a href="#1）引入起步依赖" class="headerlink" title="1）引入起步依赖"></a>1）引入起步依赖</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;com.github.pagehelper&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;pagehelper-spring-boot-starter&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;<span class="number">1.4</span><span class="number">.2</span>&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+<h4 id="2）配置文件"><a href="#2）配置文件" class="headerlink" title="2）配置文件"></a>2）配置文件</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#分页插件配置</span><br><span class="line">pagehelper:</span><br><span class="line">  #合理化分页条件 不超出正常的页码</span><br><span class="line">  reasonable: true</span><br><span class="line">  # 自动根据驱动获取方言</span><br><span class="line">  auto-dialect: true</span><br></pre></td></tr></table></figure>
+<h4 id="3）在查询语句前添加方法"><a href="#3）在查询语句前添加方法" class="headerlink" title="3）在查询语句前添加方法"></a>3）在查询语句前添加方法</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// 页码，从1开始</span><br><span class="line">PageHelper.startPage(1,10);</span><br><span class="line">//下面的首个SQL语句是将要分页的SQL</span><br><span class="line">List&lt;Emp&gt; empList = mapper.find();</span><br></pre></td></tr></table></figure>
+<h4 id="4）结果处理"><a href="#4）结果处理" class="headerlink" title="4）结果处理"></a>4）结果处理</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">// 获取分页结果</span><br><span class="line">Page&lt;Emp&gt; pageData = (Page&lt;Emp&gt;) empList;</span><br><span class="line">// 获取总记录数</span><br><span class="line">pageData.getTotal();</span><br><span class="line">// 获取本页记录列表</span><br><span class="line">pageData.getResult();</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="配置文件语法与读取"><a href="#配置文件语法与读取" class="headerlink" title="配置文件语法与读取"></a>配置文件语法与读取</h1><h3 id="springboot项目中配置文件格式："><a href="#springboot项目中配置文件格式：" class="headerlink" title="springboot项目中配置文件格式："></a>springboot项目中配置文件格式：</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">.properties</span><br><span class="line">.yml</span><br><span class="line">.yaml</span><br></pre></td></tr></table></figure>
+<h4 id="properties格式如下："><a href="#properties格式如下：" class="headerlink" title="properties格式如下："></a>properties格式如下：</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">key=value</span><br><span class="line">key2=value2</span><br><span class="line">spring.datasource.username=root</span><br><span class="line">spring.datasource.password=root</span><br><span class="line">mybatis.configuration.log-impl=org.apache.ibatis.logging.stdout.StdOutImpl</span><br></pre></td></tr></table></figure>
+<h3 id="yml语法"><a href="#yml语法" class="headerlink" title="yml语法"></a>yml语法</h3><pre><code>**YAML** 是一种可读性高，以数据为中心的数据序列化格式。可以表达 **对象（键值对）**，**数组**，**标量** 这几种数据形式，能够被多种编程语言和脚本语言解析。主要用做配置文件！
+</code></pre>
+<h4 id="语法格式要求："><a href="#语法格式要求：" class="headerlink" title="语法格式要求："></a>语法格式要求：</h4><ul>
+<li>以 k: v 的形式来表示键值对的关系，<strong>冒号后面必须有一个空格</strong></li>
+<li><h1 id="表示注释"><a href="#表示注释" class="headerlink" title="表示注释"></a>表示注释</h1></li>
+<li>对大小写敏感</li>
+<li>通过缩进来表示层级关系，<strong>缩排中空格的数目不重要，只要相同阶层的元素左侧对齐就可以了</strong></li>
+<li>缩进只能使用空格，不能使用 tab 缩进键</li>
+<li><strong>字符串可以不用双引号</strong></li>
+</ul>
+<h4 id="语法表示："><a href="#语法表示：" class="headerlink" title="语法表示："></a>语法表示：</h4><h5 id="1）标量-值"><a href="#1）标量-值" class="headerlink" title="1）标量(值)"></a>1）标量(值)</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">整数、浮点数、字符串、布尔值、Null、时间、日期</span><br></pre></td></tr></table></figure>
+<p><strong>示例：</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">name: zhangsan #字符串</span><br><span class="line">age: 10</span><br><span class="line">birthday: 2022-01-01 #日期</span><br></pre></td></tr></table></figure>
+<p><strong>字符串的特殊写法：</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#单引号</span><br><span class="line">name: &#x27;zhang \n san&#x27; #会读取转义符并识别</span><br><span class="line">#双引号</span><br><span class="line">name: &quot;zhang \n san&quot; #不识别转义符，原样输出。</span><br></pre></td></tr></table></figure>
+<p>当有的值中具有空格、0为前缀时，记得用引号！</p>
+<h5 id="2）对象"><a href="#2）对象" class="headerlink" title="2）对象"></a>2）对象</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">user:</span><br><span class="line">  name: zhangsan #字符串</span><br><span class="line">  age: 10</span><br><span class="line">  birthday: 2022-01-01 #日期</span><br></pre></td></tr></table></figure>
+<h5 id="3）数组-集合"><a href="#3）数组-集合" class="headerlink" title="3）数组&#x2F;集合"></a>3）数组&#x2F;集合</h5><p><strong>简单示例：</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">namelist:</span><br><span class="line">  - zhangsan</span><br><span class="line">  - lisi</span><br><span class="line">  - wangwu</span><br></pre></td></tr></table></figure>
+<p><strong>复杂示例(嵌套)</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">members:</span><br><span class="line">  - name: zhangsan</span><br><span class="line">    age: 10</span><br><span class="line">  - name: lisi</span><br><span class="line">    age: 20</span><br></pre></td></tr></table></figure>
+<h3 id="配置内容读取"><a href="#配置内容读取" class="headerlink" title="配置内容读取"></a>配置内容读取</h3><p>读取方式分为3中：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1) org.springframework.core.env.Environment类;</span><br><span class="line">2) @Value注解，采用$&#123;&#125;方式读取！注意，在@Value也有#&#123;&#125;的写法，但是在此写法中写的是spEL表达式！！！注意和mybatis做区分！！！</span><br><span class="line">3) @ConfigurationProperties注解，采用prefix前缀+实体类属性对应</span><br></pre></td></tr></table></figure>
+<h4 id="Value"><a href="#Value" class="headerlink" title="@Value"></a>@Value</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">@RestController</span><br><span class="line">public class ParamController &#123;</span><br><span class="line"></span><br><span class="line">    @Value(&quot;$&#123;ali.ak&#125;&quot;)</span><br><span class="line">    private String ak;</span><br><span class="line"></span><br><span class="line">    @Value(&quot;$&#123;ali.sk&#125;&quot;)</span><br><span class="line">    private String sk;</span><br><span class="line"></span><br><span class="line">    @RequestMapping(&quot;read&quot;)</span><br><span class="line">    public String read()&#123;</span><br><span class="line">        return &quot;OK&quot; + ak + &quot;&gt;&gt;&gt;&gt;&quot;+ sk;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="ConfigurationProperties"><a href="#ConfigurationProperties" class="headerlink" title="@ConfigurationProperties"></a>@ConfigurationProperties</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">import lombok.Data;</span><br><span class="line">import org.springframework.boot.context.properties.ConfigurationProperties;</span><br><span class="line">import org.springframework.context.annotation.Configuration;</span><br><span class="line">import org.springframework.stereotype.Component;</span><br><span class="line"></span><br><span class="line">@Component //@Configuration</span><br><span class="line">@ConfigurationProperties(prefix = &quot;ali&quot;) //读取ali前缀的对象 让该对象的属性和本类的属性对应即可！</span><br><span class="line">@Data</span><br><span class="line">public class AliParam &#123;</span><br><span class="line">    private String endpoint;</span><br><span class="line">    private String ak;</span><br><span class="line">    private String sk;</span><br><span class="line">    private String bucketName;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">@RestController</span><br><span class="line">public class ParamController &#123;</span><br><span class="line"></span><br><span class="line">    @Autowired</span><br><span class="line">    private AliParam aliParam;</span><br><span class="line"></span><br><span class="line">    @RequestMapping(&quot;read02&quot;)</span><br><span class="line">    public String read02()&#123;</span><br><span class="line">        return &quot;OK&quot; + aliParam.getAk() + &quot;&gt;&gt;&gt;&gt;&quot;+ aliParam.getSk();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="阿里云第三方服务调用"><a href="#阿里云第三方服务调用" class="headerlink" title="阿里云第三方服务调用"></a>阿里云第三方服务调用</h1><h3 id="文件存储"><a href="#文件存储" class="headerlink" title="文件存储"></a>文件存储</h3><p>1）服务器所在磁盘存储<br>    简单直接；面临扩容问题。<br>2）分布式文件存储服务，如FastDFS、MinIO（项目中再学习）<br>    分布式扩容方便，可以做主备；需专门主机搭建服务，搭建环境复杂。<br>3）线上云存储服务，如各种云厂商<br>    使用方便，有数据备份（大部分比较稳定）；收费。</p>
+<h3 id="阿里云OSS"><a href="#阿里云OSS" class="headerlink" title="阿里云OSS"></a>阿里云OSS</h3><p><a target="_blank" rel="noopener" href="https://help.aliyun.com/product/31815.html">https://help.aliyun.com/product/31815.html</a></p>
+<h3 id="根据阿里云官网进行代码抽取"><a href="#根据阿里云官网进行代码抽取" class="headerlink" title="根据阿里云官网进行代码抽取"></a>根据阿里云官网进行代码抽取</h3><h4 id="1）导入依赖"><a href="#1）导入依赖" class="headerlink" title="1）导入依赖"></a>1）导入依赖</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;com.aliyun.oss&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;aliyun-sdk-oss&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;3.16.0&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;javax.xml.bind&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;jaxb-api&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;2.3.1&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;javax.activation&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;activation&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;1.1.1&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br><span class="line">&lt;!-- no more than 2.3.3--&gt;</span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;org.glassfish.jaxb&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;jaxb-runtime&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;2.3.3&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+
+<h4 id="2）找到官方SDK改动即可"><a href="#2）找到官方SDK改动即可" class="headerlink" title="2）找到官方SDK改动即可"></a>2）找到官方SDK改动即可</h4><h1 id="实现一对一"><a href="#实现一对一" class="headerlink" title="实现一对一"></a>实现一对一</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&lt;resultMap id=<span class="string">&quot;empMap&quot;</span> type=<span class="string">&quot;com.heima.tlias.pojo.Emp&quot;</span> autoMapping=<span class="string">&quot;true&quot;</span>&gt;</span><br><span class="line">&lt;!--        &lt;id column=<span class="string">&quot;id&quot;</span> property=<span class="string">&quot;id&quot;</span>&gt;&lt;/id&gt;</span><br><span class="line">        &lt;result column=<span class="string">&quot;username&quot;</span> property=<span class="string">&quot;username&quot;</span>&gt;&lt;/result&gt;</span><br><span class="line">        &lt;result column=<span class="string">&quot;password&quot;</span> property=<span class="string">&quot;password&quot;</span>&gt;&lt;/result&gt;</span><br><span class="line">        &lt;result column=<span class="string">&quot;name&quot;</span> property=<span class="string">&quot;name&quot;</span>&gt;&lt;/result&gt;</span><br><span class="line">        &lt;result column=<span class="string">&quot;gender&quot;</span> property=<span class="string">&quot;gender&quot;</span>&gt;&lt;/result&gt;</span><br><span class="line">        &lt;result column=<span class="string">&quot;image&quot;</span> property=<span class="string">&quot;image&quot;</span>&gt;&lt;/result&gt;</span><br><span class="line">        &lt;result column=<span class="string">&quot;job&quot;</span> property=<span class="string">&quot;job&quot;</span>&gt;&lt;/result&gt;</span><br><span class="line">        &lt;result column=<span class="string">&quot;entrydate&quot;</span> property=<span class="string">&quot;entrydate&quot;</span>&gt;&lt;/result&gt;</span><br><span class="line">        &lt;result column=<span class="string">&quot;dept_id&quot;</span> property=<span class="string">&quot;deptId&quot;</span>&gt;&lt;/result&gt;</span><br><span class="line">        &lt;result column=<span class="string">&quot;create_time&quot;</span> property=<span class="string">&quot;createTime&quot;</span>&gt;&lt;/result&gt;</span><br><span class="line">        &lt;result column=<span class="string">&quot;update_time&quot;</span> property=<span class="string">&quot;updateTime&quot;</span>&gt;&lt;/result&gt;--&gt;</span><br><span class="line">        &lt;association property=<span class="string">&quot;dept&quot;</span> javaType=<span class="string">&quot;com.heima.tlias.pojo.Dept&quot;</span> autoMapping=<span class="string">&quot;true&quot;</span>&gt;</span><br><span class="line">&lt;!--            &lt;id column=<span class="string">&quot;id&quot;</span> property=<span class="string">&quot;id&quot;</span>&gt;&lt;/id&gt;--&gt;</span><br><span class="line">            &lt;result column=<span class="string">&quot;dname&quot;</span> property=<span class="string">&quot;name&quot;</span>&gt;&lt;/result&gt;</span><br><span class="line">&lt;!--            &lt;result column=<span class="string">&quot;create_time&quot;</span> property=<span class="string">&quot;createTime&quot;</span>&gt;&lt;/result&gt;--&gt;</span><br><span class="line">&lt;!--            &lt;result column=<span class="string">&quot;update_time&quot;</span> property=<span class="string">&quot;updateTime&quot;</span>&gt;&lt;/result&gt;--&gt;</span><br><span class="line">        &lt;/association&gt;</span><br><span class="line">    &lt;/resultMap&gt;</span><br></pre></td></tr></table></figure>
+
+
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>河马
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://example.com/2023/08/15/Mybatis/" title="Mybatis">http://example.com/2023/08/15/Mybatis/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+ 
+   <div>
+     <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:24px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+   </div>
+ 
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/08/15/%E7%99%BB%E5%BD%95%E6%A0%A1%E9%AA%8C%E6%8A%80%E6%9C%AF/" rel="prev" title="登录校验技术">
+      <i class="fa fa-chevron-left"></i> 登录校验技术
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/08/15/EasyExcel/" rel="next" title="EasyExcel">
+      EasyExcel <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#JDBC"><span class="nav-number">1.</span> <span class="nav-text">JDBC</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A4"><span class="nav-number">1.1.</span> <span class="nav-text">步骤</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#MyBatis%E5%85%A5%E9%97%A8"><span class="nav-number">2.</span> <span class="nav-text">MyBatis入门</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%AD%A5%E9%AA%A4"><span class="nav-number">2.1.</span> <span class="nav-text">使用步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1%EF%BC%89%E5%BC%95%E5%85%A5%E8%B5%B7%E6%AD%A5%E4%BE%9D%E8%B5%96%E4%B8%8E%E9%A9%B1%E5%8A%A8"><span class="nav-number">2.1.0.1.</span> <span class="nav-text">1）引入起步依赖与驱动</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2%EF%BC%89%E5%88%9B%E5%BB%BA%E4%B8%8E%E8%A1%A8%E5%AF%B9%E5%BA%94%E7%9A%84%E5%AE%9E%E4%BD%93%E7%B1%BB"><span class="nav-number">2.1.0.2.</span> <span class="nav-text">2）创建与表对应的实体类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3%EF%BC%89%E9%85%8D%E7%BD%AE%E6%95%B0%E6%8D%AE%E5%BA%93%E8%BF%9E%E6%8E%A5-application-yml"><span class="nav-number">2.1.0.3.</span> <span class="nav-text">3）配置数据库连接 application.yml</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4%EF%BC%89%E5%BC%80%E5%8F%91DAO%E5%B1%82%E4%BB%A3%E7%A0%81-%E6%8E%A5%E5%8F%A3"><span class="nav-number">2.1.0.4.</span> <span class="nav-text">4）开发DAO层代码(接口)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5%EF%BC%89%E6%B5%8B%E8%AF%95"><span class="nav-number">2.1.0.5.</span> <span class="nav-text">5）测试</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%BA%93%E8%BF%9E%E6%8E%A5%E6%B1%A0"><span class="nav-number">2.2.</span> <span class="nav-text">数据库连接池</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#bug"><span class="nav-number">2.3.</span> <span class="nav-text">bug</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%E3%80%81%E5%AF%86%E7%A0%81%E9%94%99%E8%AF%AF"><span class="nav-number">2.3.1.</span> <span class="nav-text">1、密码错误</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%E3%80%81%E7%A9%BA%E6%8C%87%E9%92%88"><span class="nav-number">2.3.2.</span> <span class="nav-text">2、空指针</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%E3%80%81%E6%B5%8B%E8%AF%95%E7%B1%BB%E6%97%A0%E6%B3%95%E5%90%AF%E5%8A%A8"><span class="nav-number">2.3.3.</span> <span class="nav-text">3、测试类无法启动</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">3.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#MyBatis%E5%9F%BA%E7%A1%80%E5%BA%94%E7%94%A8"><span class="nav-number">4.</span> <span class="nav-text">MyBatis基础应用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#XML%E6%98%A0%E5%B0%84%E6%96%87%E4%BB%B6%E5%BC%80%E5%8F%91%E6%A8%A1%E5%BC%8F"><span class="nav-number">4.1.</span> <span class="nav-text">XML映射文件开发模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%AD%A5%E9%AA%A4-1"><span class="nav-number">4.1.1.</span> <span class="nav-text">使用步骤</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#XML%E7%9A%84%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F"><span class="nav-number">4.1.2.</span> <span class="nav-text">XML的使用方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BUG"><span class="nav-number">4.1.3.</span> <span class="nav-text">BUG</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%80%E5%8C%96-Mapper%E6%B3%A8%E8%A7%A3%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="nav-number">4.1.4.</span> <span class="nav-text">简化@Mapper注解的使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#lombok%E4%BD%BF%E7%94%A8"><span class="nav-number">4.1.5.</span> <span class="nav-text">lombok使用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%AD%A5%E9%AA%A4-2"><span class="nav-number">4.1.5.1.</span> <span class="nav-text">使用步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1%EF%BC%89%E5%9C%A8pom-xml%E6%96%87%E4%BB%B6%E4%B8%AD%E5%BC%95%E5%85%A5%E4%BE%9D%E8%B5%96"><span class="nav-number">4.1.5.1.1.</span> <span class="nav-text">1）在pom.xml文件中引入依赖</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2%EF%BC%89%E5%9C%A8%E5%AE%9E%E4%BD%93%E7%B1%BB%E4%B8%8A%E6%B7%BB%E5%8A%A0%E6%B3%A8%E8%A7%A3"><span class="nav-number">4.1.5.1.2.</span> <span class="nav-text">2）在实体类上添加注解</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#XML%E6%98%A0%E5%B0%84%E6%96%87%E4%BB%B6%E7%9A%84CRUD"><span class="nav-number">4.2.</span> <span class="nav-text">XML映射文件的CRUD</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9F%A5%E8%AF%A2%E7%BB%83%E4%B9%A0%E6%A0%87%E7%AD%BE"><span class="nav-number">4.2.1.</span> <span class="nav-text">查询练习标签</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1%E3%80%81%E5%9F%BA%E4%BA%8EID%E8%BF%9B%E8%A1%8C%E6%9F%A5%E8%AF%A2"><span class="nav-number">4.2.1.1.</span> <span class="nav-text">1、基于ID进行查询</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2%E3%80%81%E5%9F%BA%E4%BA%8E%E6%9F%A5%E8%AF%A2%E6%9D%A1%E4%BB%B6%E7%BB%83%E4%B9%A0"><span class="nav-number">4.2.1.2.</span> <span class="nav-text">2、基于查询条件练习</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B0%E5%A2%9E%E7%BB%83%E4%B9%A0%E6%A0%87%E7%AD%BE"><span class="nav-number">4.2.2.</span> <span class="nav-text">新增练习标签</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9B%B4%E6%96%B0%E7%BB%83%E4%B9%A0%E6%A0%87%E7%AD%BE"><span class="nav-number">4.2.3.</span> <span class="nav-text">更新练习标签</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E7%BB%83%E4%B9%A0%E6%A0%87%E7%AD%BE"><span class="nav-number">4.2.4.</span> <span class="nav-text">删除练习标签</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%87%E7%AD%BE%E5%B1%9E%E6%80%A7-%E5%8F%82%E6%95%B0%E6%95%B0%E9%87%8F%E5%B0%8F%E7%BB%93"><span class="nav-number">4.2.5.</span> <span class="nav-text">标签属性&amp;参数数量小结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mybatis%E5%AD%97%E6%AE%B5%E5%90%8D%E3%80%81%E5%B1%9E%E6%80%A7%E5%90%8D%E4%B8%8D%E5%AF%B9%E5%BA%94%E9%97%AE%E9%A2%98"><span class="nav-number">4.3.</span> <span class="nav-text">mybatis字段名、属性名不对应问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E5%BC%8F%E4%B8%80%EF%BC%9A%E8%B5%B7%E5%88%AB%E5%90%8D"><span class="nav-number">4.3.1.</span> <span class="nav-text">方式一：起别名</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E5%BC%8F%E4%B8%89%EF%BC%9A%E9%85%8D%E7%BD%AEyml%E6%96%87%E4%BB%B6-%E9%A9%BC%E5%B3%B0%E5%91%BD%E5%90%8D%E6%94%AF%E6%8C%81"><span class="nav-number">4.3.2.</span> <span class="nav-text">方式三：配置yml文件 驼峰命名支持</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A8%E6%80%81SQL"><span class="nav-number">4.4.</span> <span class="nav-text">动态SQL</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%E3%80%81-foreach%E5%BE%AA%E7%8E%AF"><span class="nav-number">4.4.1.</span> <span class="nav-text">1、 foreach循环</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%E3%80%81%E6%9D%A1%E4%BB%B6%E5%88%A4%E6%96%ADif"><span class="nav-number">4.4.2.</span> <span class="nav-text">2、条件判断if</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%E3%80%81where%E6%8B%BC%E6%8E%A5"><span class="nav-number">4.4.3.</span> <span class="nav-text">3、where拼接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4%E3%80%81trim%E6%8B%BC%E6%8E%A5%E2%80%93%E4%BA%86%E8%A7%A3"><span class="nav-number">4.4.4.</span> <span class="nav-text">4、trim拼接–了解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5%E3%80%81%E6%9B%B4%E6%96%B0%E5%AD%97%E6%AE%B5set%E2%80%93%E4%BA%86%E8%A7%A3"><span class="nav-number">4.4.5.</span> <span class="nav-text">5、更新字段set–了解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6%E3%80%81SQL%E7%89%87%E6%AE%B5-sql-include%E2%80%93%E4%BA%86%E8%A7%A3"><span class="nav-number">4.4.6.</span> <span class="nav-text">6、SQL片段 sql&amp;include–了解</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#mybatis%E5%88%86%E9%A1%B5%E6%8F%92%E4%BB%B6"><span class="nav-number">5.</span> <span class="nav-text">mybatis分页插件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%AD%A5%E9%AA%A4-3"><span class="nav-number">5.1.</span> <span class="nav-text">使用步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1%EF%BC%89%E5%BC%95%E5%85%A5%E8%B5%B7%E6%AD%A5%E4%BE%9D%E8%B5%96"><span class="nav-number">5.1.0.1.</span> <span class="nav-text">1）引入起步依赖</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2%EF%BC%89%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="nav-number">5.1.0.2.</span> <span class="nav-text">2）配置文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3%EF%BC%89%E5%9C%A8%E6%9F%A5%E8%AF%A2%E8%AF%AD%E5%8F%A5%E5%89%8D%E6%B7%BB%E5%8A%A0%E6%96%B9%E6%B3%95"><span class="nav-number">5.1.0.3.</span> <span class="nav-text">3）在查询语句前添加方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4%EF%BC%89%E7%BB%93%E6%9E%9C%E5%A4%84%E7%90%86"><span class="nav-number">5.1.0.4.</span> <span class="nav-text">4）结果处理</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E8%AF%AD%E6%B3%95%E4%B8%8E%E8%AF%BB%E5%8F%96"><span class="nav-number">6.</span> <span class="nav-text">配置文件语法与读取</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#springboot%E9%A1%B9%E7%9B%AE%E4%B8%AD%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F%EF%BC%9A"><span class="nav-number">6.0.1.</span> <span class="nav-text">springboot项目中配置文件格式：</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#properties%E6%A0%BC%E5%BC%8F%E5%A6%82%E4%B8%8B%EF%BC%9A"><span class="nav-number">6.0.1.1.</span> <span class="nav-text">properties格式如下：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#yml%E8%AF%AD%E6%B3%95"><span class="nav-number">6.0.2.</span> <span class="nav-text">yml语法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AF%AD%E6%B3%95%E6%A0%BC%E5%BC%8F%E8%A6%81%E6%B1%82%EF%BC%9A"><span class="nav-number">6.0.2.1.</span> <span class="nav-text">语法格式要求：</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A1%A8%E7%A4%BA%E6%B3%A8%E9%87%8A"><span class="nav-number">7.</span> <span class="nav-text">表示注释</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AF%AD%E6%B3%95%E8%A1%A8%E7%A4%BA%EF%BC%9A"><span class="nav-number">7.0.0.1.</span> <span class="nav-text">语法表示：</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1%EF%BC%89%E6%A0%87%E9%87%8F-%E5%80%BC"><span class="nav-number">7.0.0.1.1.</span> <span class="nav-text">1）标量(值)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2%EF%BC%89%E5%AF%B9%E8%B1%A1"><span class="nav-number">7.0.0.1.2.</span> <span class="nav-text">2）对象</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3%EF%BC%89%E6%95%B0%E7%BB%84-%E9%9B%86%E5%90%88"><span class="nav-number">7.0.0.1.3.</span> <span class="nav-text">3）数组&#x2F;集合</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E5%86%85%E5%AE%B9%E8%AF%BB%E5%8F%96"><span class="nav-number">7.0.1.</span> <span class="nav-text">配置内容读取</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Value"><span class="nav-number">7.0.1.1.</span> <span class="nav-text">@Value</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ConfigurationProperties"><span class="nav-number">7.0.1.2.</span> <span class="nav-text">@ConfigurationProperties</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%98%BF%E9%87%8C%E4%BA%91%E7%AC%AC%E4%B8%89%E6%96%B9%E6%9C%8D%E5%8A%A1%E8%B0%83%E7%94%A8"><span class="nav-number">8.</span> <span class="nav-text">阿里云第三方服务调用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E5%AD%98%E5%82%A8"><span class="nav-number">8.0.1.</span> <span class="nav-text">文件存储</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%98%BF%E9%87%8C%E4%BA%91OSS"><span class="nav-number">8.0.2.</span> <span class="nav-text">阿里云OSS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%B9%E6%8D%AE%E9%98%BF%E9%87%8C%E4%BA%91%E5%AE%98%E7%BD%91%E8%BF%9B%E8%A1%8C%E4%BB%A3%E7%A0%81%E6%8A%BD%E5%8F%96"><span class="nav-number">8.0.3.</span> <span class="nav-text">根据阿里云官网进行代码抽取</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1%EF%BC%89%E5%AF%BC%E5%85%A5%E4%BE%9D%E8%B5%96"><span class="nav-number">8.0.3.1.</span> <span class="nav-text">1）导入依赖</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2%EF%BC%89%E6%89%BE%E5%88%B0%E5%AE%98%E6%96%B9SDK%E6%94%B9%E5%8A%A8%E5%8D%B3%E5%8F%AF"><span class="nav-number">8.0.3.2.</span> <span class="nav-text">2）找到官方SDK改动即可</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E4%B8%80%E5%AF%B9%E4%B8%80"><span class="nav-number">9.</span> <span class="nav-text">实现一对一</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="河马"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">河马</p>
+  <div class="site-description" itemprop="description">运气也是成功的一部分</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">20</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/hippoasleep" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;hippoasleep" rel="noopener" target="_blank"><i class="github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:JLhippo@163.com" title="E-Mail → mailto:JLhippo@163.com" rel="noopener" target="_blank"><i class="envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="link fa-fw"></i>
+      链接网站
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://baidu.com/" title="https:&#x2F;&#x2F;baidu.com" rel="noopener" target="_blank">百度</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2023-08 – 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">河马</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">99k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">1:30</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+    <span id="busuanzi_container_site_pv">总访问量<span id="busuanzi_value_site_pv"></span>次</span>
+    <span class="post-meta-divider">|</span>
+    <span id="busuanzi_container_site_uv">总访客数<span id="busuanzi_value_site_uv"></span>人</span>
+    <span class="post-meta-divider">|</span>
+<!-- 不蒜子计数初始值纠正 -->
+<script>
+$(document).ready(function() {
+
+    var int = setInterval(fixCount, 50);  // 50ms周期检测函数
+    var countOffset = 20000;  // 初始化首次数据
+
+    function fixCount() {            
+       if (document.getElementById("busuanzi_container_site_pv").style.display != "none")
+        {
+            $("#busuanzi_value_site_pv").html(parseInt($("#busuanzi_value_site_pv").html()) + countOffset); 
+            clearInterval(int);
+        }                  
+        if ($("#busuanzi_container_site_pv").css("display") != "none")
+        {
+            $("#busuanzi_value_site_uv").html(parseInt($("#busuanzi_value_site_uv").html()) + countOffset); // 加上初始数据 
+            clearInterval(int); // 停止检测
+        }  
+    }
+       	
+});
+</script> 
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="CAP定理CAP定理，也称CAP原则，是计算机网络中一个重要的理论概念。它指出，分布式系统中的三个要素：一致性（Consistency）、可用性（Availability）和分区容错性（Partition tolerance）这三个要素中，最多只能同时满足其中两个。这三个性质对应了分布式系统的三个指标：而CAP理论说的就是：一个分布式系统，不可能同时做到这三点。①一致性C：对于客户端的每次读操作，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CAP和BASE">
+<meta property="og:url" content="http://example.com/2023/08/15/CAP%E5%AE%9A%E7%90%86&&BASE%E7%90%86%E8%AE%BA/index.html">
+<meta property="og:site_name" content="河马窝苑">
+<meta property="og:description" content="CAP定理CAP定理，也称CAP原则，是计算机网络中一个重要的理论概念。它指出，分布式系统中的三个要素：一致性（Consistency）、可用性（Availability）和分区容错性（Partition tolerance）这三个要素中，最多只能同时满足其中两个。这三个性质对应了分布式系统的三个指标：而CAP理论说的就是：一个分布式系统，不可能同时做到这三点。①一致性C：对于客户端的每次读操作，">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/35579562/1685532840632-8abe3aa8-2c4e-44ec-922b-78916b14f0e4.png#averageHue=%23fbfbfb&clientId=u9d407055-3c78-4&from=paste&id=uc637f979&originHeight=348&originWidth=444&originalType=url&ratio=1.25&rotation=0&showTitle=false&size=83217&status=done&style=none&taskId=u65f5d723-6b6a-462d-9b7a-a9e8b847f52&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/webp/35579562/1685584110614-a12ce920-f780-4792-a053-40ee694627da.webp#averageHue=%23edeae4&clientId=u422b6b58-5b85-4&from=paste&id=ua37b8ef5&originHeight=392&originWidth=754&originalType=url&ratio=1.25&rotation=0&showTitle=false&status=done&style=none&taskId=ud68512d8-ceb8-426a-9251-30761d6a2a9&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/webp/35579562/1685584110594-d8dd54f6-8097-446c-92ba-9ec1c20ea781.webp#averageHue=%23fafaf9&clientId=u422b6b58-5b85-4&from=paste&id=u37424c89&originHeight=455&originWidth=720&originalType=url&ratio=1.25&rotation=0&showTitle=false&status=done&style=none&taskId=u80ecb5ee-ba26-476d-86d3-322f5971b1c&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/webp/35579562/1685584110620-ef7fd809-68f0-48e0-8456-1e9ab9cfc0af.webp#averageHue=%23fbfafa&clientId=u422b6b58-5b85-4&from=paste&id=u0a2d52c6&originHeight=619&originWidth=720&originalType=url&ratio=1.25&rotation=0&showTitle=false&status=done&style=none&taskId=u88caab6c-97b9-42e8-a330-014ef8c0952&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/webp/35579562/1685584110621-28ab0c59-afd2-4960-993a-0f36f070ea6e.webp#averageHue=%23f7f7f6&clientId=u422b6b58-5b85-4&from=paste&id=u40401bdc&originHeight=465&originWidth=720&originalType=url&ratio=1.25&rotation=0&showTitle=false&status=done&style=none&taskId=uf3b8acf2-0f5c-483c-ab73-60759f2175f&title=">
+<meta property="article:published_time" content="2023-08-15T11:20:25.742Z">
+<meta property="article:modified_time" content="2023-08-15T11:31:36.022Z">
+<meta property="article:author" content="河马">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.nlark.com/yuque/0/2023/png/35579562/1685532840632-8abe3aa8-2c4e-44ec-922b-78916b14f0e4.png#averageHue=%23fbfbfb&clientId=u9d407055-3c78-4&from=paste&id=uc637f979&originHeight=348&originWidth=444&originalType=url&ratio=1.25&rotation=0&showTitle=false&size=83217&status=done&style=none&taskId=u65f5d723-6b6a-462d-9b7a-a9e8b847f52&title=">
+
+<link rel="canonical" href="http://example.com/2023/08/15/CAP%E5%AE%9A%E7%90%86&&BASE%E7%90%86%E8%AE%BA/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>CAP和BASE | 河马窝苑</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">河马窝苑</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-resources">
+
+    <a href="/resources/" rel="section"><i class="download fa-fw"></i>资源</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/08/15/CAP%E5%AE%9A%E7%90%86&&BASE%E7%90%86%E8%AE%BA/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="河马">
+      <meta itemprop="description" content="运气也是成功的一部分">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="河马窝苑">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          CAP和BASE
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-08-15 19:20:25 / 修改时间：19:31:36" itemprop="dateCreated datePublished" datetime="2023-08-15T19:20:25+08:00">2023-08-15</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>4.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>4 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="CAP定理"><a href="#CAP定理" class="headerlink" title="CAP定理"></a>CAP定理</h1><p>CAP定理，也称CAP原则，是计算机网络中一个重要的理论概念。它指出，分布式系统中的三个要素：<strong>一致性（Consistency）</strong>、<strong>可用性（Availability）</strong>和<strong>分区容错性（Partition tolerance）</strong>这三个要素中，最多只能同时满足其中两个。<br>这三个性质对应了分布式系统的三个指标：<br>而CAP理论说的就是：一个分布式系统，不可能同时做到这三点。<br><img src="https://cdn.nlark.com/yuque/0/2023/png/35579562/1685532840632-8abe3aa8-2c4e-44ec-922b-78916b14f0e4.png#averageHue=%23fbfbfb&clientId=u9d407055-3c78-4&from=paste&id=uc637f979&originHeight=348&originWidth=444&originalType=url&ratio=1.25&rotation=0&showTitle=false&size=83217&status=done&style=none&taskId=u65f5d723-6b6a-462d-9b7a-a9e8b847f52&title=" alt="image.png"><br>①<strong>一致性C：</strong>对于客户端的每次读操作，要么读到的是最新的数据，要么读取失败。换句话说，一致性是站在分布式系统的角度，对访问本系统的客户端的一种承诺：要么我给您返回一个错误，要么我给你返回绝对一致的<strong>最新数据</strong>，不难看出，其<strong>强调的是数据正确</strong>。<br>②<strong>可用性A：</strong>任何客户端的请求都能得到响应数据，不会出现响应错误。换句话说，可用性是站在分布式系统的角度，对访问本系统的客户的另一种承诺：我一定会给您返回数据，不会给你返回错误，但<strong>不保证数据最新</strong>，<strong>强调的是不出错</strong>。<br>③<strong>分区容错性P：</strong>由于分布式系统通过网络进行通信，网络是不可靠的。当任意数量的消息丢失或延迟到达时，系统仍会继续提供服务，不会挂掉。换句话说，分区容忍性是站在分布式系统的角度，对访问本系统的客户端的再一种承诺：我会一直运行，不管我的内部出现何种数据同步问题，<strong>强调的是不挂掉</strong>。</p>
+<h1 id="BASE理论"><a href="#BASE理论" class="headerlink" title="BASE理论"></a>BASE理论</h1><p>根据CAP，我们分布式共享数据的系统，要实现CP，就需要牺牲可用性；如果实现AP，则牺牲了一致性。对于大型应用来说，我们除非涉及到资金等严格要求一致性的场景，大部分我们都选择AP，即保留可用性和分区容错性，但是我们也不一定完全牺牲掉一致性，我们可以对一致性做个柔性的变动，不要求立刻一致，可以在一定时间内达到一致即可，使用BASE理论可以达到这个目的。</p>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>BASE理论是由eBay工程师提出，是对<strong>可用性</strong>和<strong>一致性</strong>的权衡。BASE是由 Basically Available(基本可用)，Soft state（软状态）,和 Eventually consistent（最终一致性）三个短语的缩写。</p>
+<h3 id="Basically-Available-基本可用"><a href="#Basically-Available-基本可用" class="headerlink" title="Basically Available(基本可用)"></a>Basically Available(基本可用)</h3><p>算作完全可用和完全不可用中的一种折中，互联网上的应用，如果是完全不可用的，那这个系统就没存在必要了；而在互联网上，用户量等有时候难以预见，就造成了用户超出系统设计的标准，想一直保持完全可用就很难，所以折中下，我们可以通过<strong>延迟响应</strong>，<strong>流量削峰</strong>等手段来保障系统的核心功能的正常，从而实现基本可用。</p>
+<h3 id="Eventually-consistent-最终一致性"><a href="#Eventually-consistent-最终一致性" class="headerlink" title="Eventually consistent(最终一致性)"></a>Eventually consistent(最终一致性)</h3><p>我们希望获取的数据就是正确的，这像一句废话，如果获取到的数据是不确定正确与否，那我们拿这些错误的数据干嘛。但是由于这样那样的问题，我们不能随时都保障数据的一致，所以我们有了数据的中间状态，即软状态，经过一定时间后，数据最终回归于最终一致，这些短暂的数据不一致性，对用户的影响很小，比如你更新一条微博动态，可能有的地方用户可以看到你这条微博消息，另外的用户看不到这条微博消息，这个影响不大，只要最终所有用户都可以看到你这条微博消息就可以了。<br>最终一致性的系统不承诺写入数据成功后，立刻就从系统中读出最新的数据，也不承诺具体多久之后可以读到最新的数据，而是尽可能保障特定时间级别之后的数据可用，这取决于很多因素，比如网络快慢，比如副本的多少等。如果我们设置过DNS域名就知道，DNS域名我们配置A记录后，域名和IP的关系不是立刻生效的，过多久也不好说，这就是个最新一致性的系统。</p>
+<h3 id="Soft-state-软状态"><a href="#Soft-state-软状态" class="headerlink" title="Soft state(软状态)"></a>Soft state(软状态)</h3><p> 软状态故名思意就是可以变动的状态，强调的是数据状态处于一种临界状态。相对于软状态，就是硬状态，就是数据的状态是确定的。对于满足ACID的数据状态是硬状态。最终一致性的系统中，数据的读出来的不一定是最新的，我理解就是一种软状态即一种短暂的临时状态。</p>
+<h2 id="如何保障基本可用"><a href="#如何保障基本可用" class="headerlink" title="如何保障基本可用"></a>如何保障基本可用</h2><p>一个正常的系统，不可用的情况，除了网络和硬件的原因外，多半是由于过载引起的。 过载的流量可能是短暂的，如果我们不加以控制，就可能会压垮系统，就要求我们要对流量进行控制来保障系统的可用性。</p>
+<h3 id="削峰填谷"><a href="#削峰填谷" class="headerlink" title="削峰填谷"></a><strong>削峰填谷</strong></h3><p>如果流量的数据我们可以控制，比如我们在做个抢购，不同的商品我们可以错开抢购时间减少系统的压力；这样就避免了大量的流量突发到系统中，从而压垮系统；<br>如果我们无法控制流量，那我们可以将数据保存到队列中的方式。我们系统可以根据自己处理能力，来消费队列数据，从而达到削峰填谷的目的。</p>
+<h3 id="延迟响应"><a href="#延迟响应" class="headerlink" title="延迟响应"></a><strong>延迟响应</strong></h3><p>刚才的削峰填谷利用到了队列，对用户的请求不直接处理，而是缓存起来，慢慢处理，处理完毕后再返回，这对用户来说响应被延迟了，但是系统却可以处理更多的用户请求，这也是保证系统基本可用的一种手段。</p>
+<h3 id="服务降级"><a href="#服务降级" class="headerlink" title="服务降级"></a><strong>服务降级</strong></h3><p>服务降级体现了基本可用的基本所在，在超系统负载的大流量过来之后，我们牺牲系统非必要的功能，比如降低日志级别，比如显示分辨率更低的图片等手段，来降低系统的资源消耗，保证核心能力的正常运行，这也是保证系统基本可用手段。</p>
+<h3 id="过载保护"><a href="#过载保护" class="headerlink" title="过载保护"></a><strong>过载保护</strong></h3><p>如果以上手段，还是无法应对现在的流量，只能进入过载保护截断了，系统根据自己的能力抛弃超时的请求，或者随机抛弃一些请求，直接返回错误。这是比较狠的，比较粗暴直接的手段来保证系统的可用。</p>
+<h2 id="最终一致性"><a href="#最终一致性" class="headerlink" title="最终一致性"></a><strong>最终一致性</strong></h2><p>存在最终一致性的系统，显然是存在多个副本的，通过多个副本来保证系统的可用性。在网络中不同的节点存在同一个副本，那就会存在副本数据的不一致问题，因为网络复制必然会存在延迟，当然我们可以等所有的副本数据都同步完成后再进行返回给客户端，但是那样系统的性能必然比较低，而且一旦一个副本所在的节点断开了，系统就无法响应了，可用性都难以保证了。<br>所以在一致性要求不严格的情况下，我们多采用最终一致性，那最终又是通过上面手段来保证的那，是如果修复不同的副本数据那。</p>
+<h3 id="写时修复"><a href="#写时修复" class="headerlink" title="写时修复"></a><strong>写时修复</strong></h3><p>其实这是能想到的最直接的方式，在多个副本写的时候，如果其中一个写失败了，就缓存起来，系统自动通过重试的手段进行修复。 在我看来，写时修复，更快达到最终一致性，因为修复动作离写操作最近。 而且写时修复不需要进行数据对比，所以性能最好。</p>
+<h3 id="读时修复"><a href="#读时修复" class="headerlink" title="读时修复"></a><strong>读时修复</strong></h3><p>我们在写数据的时候不关心失败还是成功，只是在读数据的时候，我们可以同时读多个节点的同一份数据，然后根据一定的规则，比如以超过半数的数据值为准的办法，来决定返回的值，如果我们写的时候也按照一定规则的话（比如写要超过半数的节点），我们就可以任务这个数据值是正确的，以这个值为准修复刚才不是这个值的节点。 比如 Cassandra 的 Read Repair 模式下，读时候发现数据不一致的时候会自动修复。</p>
+<h3 id="异步修复"><a href="#异步修复" class="headerlink" title="异步修复"></a><strong>异步修复</strong></h3><p>通过定时不同节点比对的方式，来对照数据是否需要修复，如果需要修复，则进行同步。 这种修复方式，由于涉及到数据的比对，所以性能不是很好。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a><strong>总结</strong></h2><p>BASE理论是ACID在复杂的互联网环节的一种妥协，通过弹性的基本可用来实现最终一致性。也是现在众多NoSQL系统的设计的理论基础。</p>
+<h1 id="ACID"><a href="#ACID" class="headerlink" title="ACID"></a>ACID</h1><p>ACID是衡量事务的四个特性</p>
+<ul>
+<li>原子性（Atomicity）</li>
+<li>一致性（Consistency）</li>
+<li>隔离性（Isolation）</li>
+<li>持久性（Durability）</li>
+</ul>
+<p>需要注意的是，在最开始的定义中，事务必须要满足这四个特性。<br>但在许多地方的实际应用中，这四个特性并没有被完全实现，比如MySQL、Redis的事务就不支持原子性，所以后来这四个特性渐渐地变成了衡量事务的标准而不是事务的必须条件</p>
+<h3 id="原子性（Atomicity）"><a href="#原子性（Atomicity）" class="headerlink" title="原子性（Atomicity）"></a>原子性（Atomicity）</h3><p>原子性是指一个事务是一个不可分割的工作单位，其中的操作要么都做，要么都不做<br>数据库中：如果事务中一个sql语句执行失败，则已执行的语句也必须回滚，数据库退回到事务前的状态<br>（Ps：上面只是举个例子，要注意的是MySQL的事务并不支持原子性，在MySQL中，如果事务中的一条sql无法执行，它会将这一条sql报错，并继续执行接下来的sql，且已执行的sql也不回滚，除非我们主动使用逻辑判断要求报错时执行回滚，否则MySQL的事务本身是不会回滚的）</p>
+<h3 id="持久性（Durability）"><a href="#持久性（Durability）" class="headerlink" title="持久性（Durability）"></a>持久性（Durability）</h3><p>持久性是指事务一旦提交，它对数据库的改变就应该是永久性的。接下来的其他操作或故障不应该对其有任何影响。<br>简单理解：就是数据的持久化</p>
+<h3 id="隔离性（Isolation）"><a href="#隔离性（Isolation）" class="headerlink" title="隔离性（Isolation）"></a>隔离性（Isolation）</h3><p>与原子性、持久性侧重于研究事务本身不同，隔离性研究的是不同事务之间的相互影响。<strong>隔离性是指，事务内部的操作与其他事务是隔离的，并发执行的各个事务之间不能互相干扰。</strong><br>通常使用锁机制来保证事务的隔离性<br><strong>1：锁机制</strong><br>MySQL数据库中：MyIsam存储引擎只支持表锁，InnoDB存储引擎同时支持表锁和行锁，出于性能考虑，绝大多数情况下使用的都是行锁。<br><strong>2：脏读、不可重复读和幻读</strong><br>若不保证事务的隔离性，则有可能会出现数据的【脏读、不可重复读和幻读】<br>（1）脏读：当前事务(A)中可以读到其他事务(B)未提交的数据（脏数据），这种现象是脏读<br>举例如下（以账户余额表为例）：<br><img src="https://cdn.nlark.com/yuque/0/2023/webp/35579562/1685584110614-a12ce920-f780-4792-a053-40ee694627da.webp#averageHue=%23edeae4&clientId=u422b6b58-5b85-4&from=paste&id=ua37b8ef5&originHeight=392&originWidth=754&originalType=url&ratio=1.25&rotation=0&showTitle=false&status=done&style=none&taskId=ud68512d8-ceb8-426a-9251-30761d6a2a9&title="><br>（2）不可重复读：在事务A中先后两次读取同一个数据，两次读取的结果不一样，这种现象称为不可重复读<br>脏读与不可重复读的区别在于：前者读到的是其他事务未提交的数据，后者读到的是其他事务已提交的数据。举例如下：<br><img src="https://cdn.nlark.com/yuque/0/2023/webp/35579562/1685584110594-d8dd54f6-8097-446c-92ba-9ec1c20ea781.webp#averageHue=%23fafaf9&clientId=u422b6b58-5b85-4&from=paste&id=u37424c89&originHeight=455&originWidth=720&originalType=url&ratio=1.25&rotation=0&showTitle=false&status=done&style=none&taskId=u80ecb5ee-ba26-476d-86d3-322f5971b1c&title="><br>（3）幻读：在事务A中按照某个条件先后两次查询数据库，两次查询结果的条数不同，这种现象称为幻读<br>不可重复读与幻读的区别可以通俗的理解为：前者是数据变了，后者是数据的行数变了。举例如下：<br><img src="https://cdn.nlark.com/yuque/0/2023/webp/35579562/1685584110620-ef7fd809-68f0-48e0-8456-1e9ab9cfc0af.webp#averageHue=%23fbfafa&clientId=u422b6b58-5b85-4&from=paste&id=u0a2d52c6&originHeight=619&originWidth=720&originalType=url&ratio=1.25&rotation=0&showTitle=false&status=done&style=none&taskId=u88caab6c-97b9-42e8-a330-014ef8c0952&title="><br><strong>2： 事务隔离级别</strong><br>SQL标准中定义了四种隔离级别，并规定了每种隔离级别下上述几个问题是否存在。一般来说，隔离级别越低，系统开销越低，可支持的并发越高，但隔离性也越差。隔离级别与读问题的关系如下：<br><img src="https://cdn.nlark.com/yuque/0/2023/webp/35579562/1685584110621-28ab0c59-afd2-4960-993a-0f36f070ea6e.webp#averageHue=%23f7f7f6&clientId=u422b6b58-5b85-4&from=paste&id=u40401bdc&originHeight=465&originWidth=720&originalType=url&ratio=1.25&rotation=0&showTitle=false&status=done&style=none&taskId=uf3b8acf2-0f5c-483c-ab73-60759f2175f&title="><br>在实际应用中，<strong>读未提交</strong>在并发时会导致很多问题，而性能相对于其他隔离级别提高却很有限，因此使用较少。<strong>可串行化</strong>强制事务串行，并发效率很低，只有当对数据一致性要求极高且可以接受没有并发时使用，因此使用也较少。因此在大多数数据库系统中，默认的隔离级别是<strong>读已提交(如Oracle)<strong>或</strong>可重复读</strong><br>另外，InnoDB默认的隔离级别是【可重复读】，但是InnoDB通过MVCC（MVCC全称Multi-Version Concurrency Control，即多版本的并发控制协议）避免了幻读问题</p>
+<h3 id="一致性（Consistency）"><a href="#一致性（Consistency）" class="headerlink" title="一致性（Consistency）"></a>一致性（Consistency）</h3><p>MySQL中：一致性是指事务执行结束后，<strong>数据库的完整性约束没有被破坏，事务执行的前后都是合法的数据状态。</strong><br>数据库的完整性约束包括但不限于：实体完整性（如行的主键存在且唯一）、列完整性（如字段的类型、大小、长度要符合要求）、外键约束、用户自定义完整性（如转账前后，两个账户余额的和应该不变）<br>简单理解：就是事务执行前后，数据的改变都是合法，且各方数据都是一致的<br>另外，我们应当理解到，事务的目的就是为了数据一致性<br><strong>如何实现事务的一致性：</strong><br>1：保证事务的原子性、持久性和隔离性<br>2：数据库本身提供保障，完善其完整性约束<br>3：应用层面进行保障，例如如果转账操作只扣除转账者的余额，而没有增加接收者的余额，无论数据库实现的多么完美，也无法保证状态的一致</p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>河马
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://example.com/2023/08/15/CAP%E5%AE%9A%E7%90%86&&BASE%E7%90%86%E8%AE%BA/" title="CAP和BASE">http://example.com/2023/08/15/CAP定理&&BASE理论/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+ 
+   <div>
+     <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:24px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+   </div>
+ 
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/08/15/Feign%E8%BF%9C%E7%A8%8B%E8%B0%83%E7%94%A8/" rel="prev" title="Feign远程调用">
+      <i class="fa fa-chevron-left"></i> Feign远程调用
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/08/15/%E7%BB%9F%E4%B8%80%E7%BD%91%E5%85%B3GateWay/" rel="next" title="GateWay">
+      GateWay <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#CAP%E5%AE%9A%E7%90%86"><span class="nav-number">1.</span> <span class="nav-text">CAP定理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#BASE%E7%90%86%E8%AE%BA"><span class="nav-number">2.</span> <span class="nav-text">BASE理论</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">2.1.</span> <span class="nav-text">介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Basically-Available-%E5%9F%BA%E6%9C%AC%E5%8F%AF%E7%94%A8"><span class="nav-number">2.1.1.</span> <span class="nav-text">Basically Available(基本可用)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Eventually-consistent-%E6%9C%80%E7%BB%88%E4%B8%80%E8%87%B4%E6%80%A7"><span class="nav-number">2.1.2.</span> <span class="nav-text">Eventually consistent(最终一致性)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Soft-state-%E8%BD%AF%E7%8A%B6%E6%80%81"><span class="nav-number">2.1.3.</span> <span class="nav-text">Soft state(软状态)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E4%BF%9D%E9%9A%9C%E5%9F%BA%E6%9C%AC%E5%8F%AF%E7%94%A8"><span class="nav-number">2.2.</span> <span class="nav-text">如何保障基本可用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%89%8A%E5%B3%B0%E5%A1%AB%E8%B0%B7"><span class="nav-number">2.2.1.</span> <span class="nav-text">削峰填谷</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BB%B6%E8%BF%9F%E5%93%8D%E5%BA%94"><span class="nav-number">2.2.2.</span> <span class="nav-text">延迟响应</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%8D%E5%8A%A1%E9%99%8D%E7%BA%A7"><span class="nav-number">2.2.3.</span> <span class="nav-text">服务降级</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%87%E8%BD%BD%E4%BF%9D%E6%8A%A4"><span class="nav-number">2.2.4.</span> <span class="nav-text">过载保护</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%80%E7%BB%88%E4%B8%80%E8%87%B4%E6%80%A7"><span class="nav-number">2.3.</span> <span class="nav-text">最终一致性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%99%E6%97%B6%E4%BF%AE%E5%A4%8D"><span class="nav-number">2.3.1.</span> <span class="nav-text">写时修复</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%BB%E6%97%B6%E4%BF%AE%E5%A4%8D"><span class="nav-number">2.3.2.</span> <span class="nav-text">读时修复</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%82%E6%AD%A5%E4%BF%AE%E5%A4%8D"><span class="nav-number">2.3.3.</span> <span class="nav-text">异步修复</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">2.4.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ACID"><span class="nav-number">3.</span> <span class="nav-text">ACID</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%9F%E5%AD%90%E6%80%A7%EF%BC%88Atomicity%EF%BC%89"><span class="nav-number">3.0.1.</span> <span class="nav-text">原子性（Atomicity）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%81%E4%B9%85%E6%80%A7%EF%BC%88Durability%EF%BC%89"><span class="nav-number">3.0.2.</span> <span class="nav-text">持久性（Durability）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9A%94%E7%A6%BB%E6%80%A7%EF%BC%88Isolation%EF%BC%89"><span class="nav-number">3.0.3.</span> <span class="nav-text">隔离性（Isolation）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E8%87%B4%E6%80%A7%EF%BC%88Consistency%EF%BC%89"><span class="nav-number">3.0.4.</span> <span class="nav-text">一致性（Consistency）</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="河马"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">河马</p>
+  <div class="site-description" itemprop="description">运气也是成功的一部分</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">20</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/hippoasleep" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;hippoasleep" rel="noopener" target="_blank"><i class="github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:JLhippo@163.com" title="E-Mail → mailto:JLhippo@163.com" rel="noopener" target="_blank"><i class="envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="link fa-fw"></i>
+      链接网站
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://baidu.com/" title="https:&#x2F;&#x2F;baidu.com" rel="noopener" target="_blank">百度</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2023-08 – 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">河马</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">99k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">1:30</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+    <span id="busuanzi_container_site_pv">总访问量<span id="busuanzi_value_site_pv"></span>次</span>
+    <span class="post-meta-divider">|</span>
+    <span id="busuanzi_container_site_uv">总访客数<span id="busuanzi_value_site_uv"></span>人</span>
+    <span class="post-meta-divider">|</span>
+<!-- 不蒜子计数初始值纠正 -->
+<script>
+$(document).ready(function() {
+
+    var int = setInterval(fixCount, 50);  // 50ms周期检测函数
+    var countOffset = 20000;  // 初始化首次数据
+
+    function fixCount() {            
+       if (document.getElementById("busuanzi_container_site_pv").style.display != "none")
+        {
+            $("#busuanzi_value_site_pv").html(parseInt($("#busuanzi_value_site_pv").html()) + countOffset); 
+            clearInterval(int);
+        }                  
+        if ($("#busuanzi_container_site_pv").css("display") != "none")
+        {
+            $("#busuanzi_value_site_uv").html(parseInt($("#busuanzi_value_site_uv").html()) + countOffset); // 加上初始数据 
+            clearInterval(int); // 停止检测
+        }  
+    }
+       	
+});
+</script> 
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
